@@ -127,8 +127,8 @@ Output pure JSON only, without any markdown backticks or commentary.`;
   const candidateModels = Array.from(
     new Set([
       process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-latest',
     ])
   );
 
@@ -209,8 +209,7 @@ export async function askDocumentQuestion(
       const actList = plan.actions
         .map(
           (a, i) =>
-            `${i + 1}. [${(a.priority || 'medium').toUpperCase()}] ${a.title}: ${a.description || ''}${
-              a.estimatedTime ? ` (${a.estimatedTime})` : ''
+            `${i + 1}. [${(a.priority || 'medium').toUpperCase()}] ${a.title}: ${a.description || ''}${a.estimatedTime ? ` (${a.estimatedTime})` : ''
             }`
         )
         .join('\n');
@@ -221,8 +220,7 @@ export async function askDocumentQuestion(
       const dlList = plan.deadlines
         .map(
           (d, i) =>
-            `${i + 1}. ${d.title} — ${d.date}${d.time ? ` at ${d.time}` : ''}${
-              d.notes ? ` (${d.notes})` : ''
+            `${i + 1}. ${d.title} — ${d.date}${d.time ? ` at ${d.time}` : ''}${d.notes ? ` (${d.notes})` : ''
             }`
         )
         .join('\n');
@@ -233,8 +231,7 @@ export async function askDocumentQuestion(
       const reqList = plan.requirements
         .map(
           (r, i) =>
-            `${i + 1}. ${r.name} (${r.format || 'Standard'})${r.details ? `: ${r.details}` : ''}${
-              r.mandatory ? ' [MANDATORY]' : ''
+            `${i + 1}. ${r.name} (${r.format || 'Standard'})${r.details ? `: ${r.details}` : ''}${r.mandatory ? ' [MANDATORY]' : ''
             }`
         )
         .join('\n');
@@ -245,8 +242,7 @@ export async function askDocumentQuestion(
       const depList = plan.dependencies
         .map(
           (dp) =>
-            `Step ${dp.stepNumber}: ${dp.title} -> Prerequisite for: ${
-              dp.prerequisiteFor || 'Next step'
+            `Step ${dp.stepNumber}: ${dp.title} -> Prerequisite for: ${dp.prerequisiteFor || 'Next step'
             }. Details: ${dp.details || ''}`
         )
         .join('\n');
@@ -316,9 +312,8 @@ Your core guidelines:
     }
   }
 
-  const userPrompt = `${historySection}${
-    structuredContext ? `EXTRACTED ACTION PLAN & CONTEXT:\n${structuredContext}\n\n` : ''
-  }ORIGINAL DOCUMENT TEXT:
+  const userPrompt = `${historySection}${structuredContext ? `EXTRACTED ACTION PLAN & CONTEXT:\n${structuredContext}\n\n` : ''
+    }ORIGINAL DOCUMENT TEXT:
 ${documentText ? documentText.slice(0, 15000) : 'None provided.'}
 
 USER QUESTION:
@@ -329,8 +324,8 @@ Provide an accurate, grounded, helpful answer:`;
   const candidateModels = Array.from(
     new Set([
       process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-latest',
     ])
   );
 
@@ -390,8 +385,7 @@ function generateHeuristicChatAnswer(documentText = '', question = '', plan = nu
       const items = plan.deadlines
         .map(
           (d) =>
-            `• **${d.title}**: ${d.date}${d.time ? ` at ${d.time}` : ''}${
-              d.notes ? ` (${d.notes})` : ''
+            `• **${d.title}**: ${d.date}${d.time ? ` at ${d.time}` : ''}${d.notes ? ` (${d.notes})` : ''
             }`
         )
         .join('\n');
@@ -411,8 +405,7 @@ function generateHeuristicChatAnswer(documentText = '', question = '', plan = nu
       const items = plan.actions
         .map(
           (a) =>
-            `• **${a.title}** (${a.priority} priority): ${a.description}${
-              a.estimatedTime ? ` [Est: ${a.estimatedTime}]` : ''
+            `• **${a.title}** (${a.priority} priority): ${a.description}${a.estimatedTime ? ` [Est: ${a.estimatedTime}]` : ''
             }`
         )
         .join('\n');
@@ -442,8 +435,7 @@ function generateHeuristicChatAnswer(documentText = '', question = '', plan = nu
       const items = plan.requirements
         .map(
           (r) =>
-            `• **${r.name}** (${r.format || 'Standard'}): ${r.details || 'Required for submission'}${
-              r.mandatory ? ' [Mandatory]' : ''
+            `• **${r.name}** (${r.format || 'Standard'}): ${r.details || 'Required for submission'}${r.mandatory ? ' [Mandatory]' : ''
             }`
         )
         .join('\n');
