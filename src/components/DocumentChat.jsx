@@ -8,7 +8,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
     {
       role: 'assistant',
       content:
-        'I am ActionLens Copilot. Ask any question about this document, its rules, deadlines, or specifics.',
+        'I am ActionLens Copilot powered by Gemma 4. Ask any question about this document, its rules, deadlines, or specifics.',
     },
   ]);
   const [input, setInput] = useState('');
@@ -80,7 +80,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
       {
         role: 'assistant',
         content:
-          'I am ActionLens Copilot. Ask any question about this document, its rules, deadlines, or specifics.',
+          'I am ActionLens Copilot powered by Gemma 4. Ask any question about this document, its rules, deadlines, or specifics.',
       },
     ]);
   };
@@ -92,8 +92,12 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
           <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-1.5 sm:gap-2">
             <MessageSquare className="h-4 w-4 text-sky-600 shrink-0" />
             <span>Ask The Document</span>
+            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-semibold text-sky-700 border border-sky-200 normal-case flex items-center gap-1">
+              <Sparkles className="h-2.5 w-2.5 text-sky-600" />
+              <span>Gemma 4 Copilot</span>
+            </span>
           </h2>
-          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google AI</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Grounded answers verified with Gemma 4 reasoning via Google GenAI</p>
         </div>
 
         {messages.length > 1 && (

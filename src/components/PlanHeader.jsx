@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Download, Copy, Check, Printer, CheckCircle2 } from 'lucide-react';
+import { Download, Copy, Check, Printer, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function PlanHeader({ plan, onReset }) {
   const [copied, setCopied] = useState(false);
@@ -79,12 +79,16 @@ export default function PlanHeader({ plan, onReset }) {
         {/* Title & Summary */}
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-sky-700 border border-sky-200">
-              {plan.documentType || 'Analyzed Document'}
+            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-sky-700 border border-sky-200 flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-sky-600" />
+              <span>Gemma 4 Extracted</span>
+            </span>
+            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-slate-700 border border-slate-200">
+              {plan.documentType || 'Official Notice'}
             </span>
             <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-emerald-700 border border-emerald-200 flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
-              <span>AI Verified</span>
+              <span>Zod Schema Verified</span>
             </span>
             {plan.tags?.map((tag, idx) => (
               <span

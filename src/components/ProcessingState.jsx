@@ -61,23 +61,21 @@ export default function ProcessingState({ step = 1, documentName = 'Uploaded Doc
           return (
             <div
               key={s.title}
-              className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
-                isCurrent
-                  ? 'border-sky-200 bg-sky-50/50'
-                  : isDone
+              className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${isCurrent
+                ? 'border-sky-200 bg-sky-50/50'
+                : isDone
                   ? 'border-slate-200 bg-slate-50/60'
                   : 'border-slate-100 bg-white opacity-50'
-              }`}
+                }`}
             >
               {/* Status Indicator */}
               <div
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                  isDone
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : isCurrent
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${isDone
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : isCurrent
                     ? 'bg-sky-100 text-sky-700'
                     : 'bg-slate-100 text-slate-400'
-                }`}
+                  }`}
               >
                 {isDone ? (
                   <Check className="h-4 w-4 stroke-[2.5]" />
@@ -92,24 +90,22 @@ export default function ProcessingState({ step = 1, documentName = 'Uploaded Doc
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span
-                    className={`text-xs font-semibold ${
-                      isCurrent
-                        ? 'text-slate-900'
-                        : isDone
+                    className={`text-xs font-semibold ${isCurrent
+                      ? 'text-slate-900'
+                      : isDone
                         ? 'text-slate-800'
                         : 'text-slate-400'
-                    }`}
+                      }`}
                   >
                     {s.title}
                   </span>
                   <span
-                    className={`text-[10px] font-medium ${
-                      isCurrent
-                        ? 'text-sky-600'
-                        : isDone
+                    className={`text-[10px] font-medium ${isCurrent
+                      ? 'text-sky-600'
+                      : isDone
                         ? 'text-emerald-600'
                         : 'text-slate-400'
-                    }`}
+                      }`}
                   >
                     {isDone ? 'Done' : isCurrent ? 'In progress...' : 'Pending'}
                   </span>

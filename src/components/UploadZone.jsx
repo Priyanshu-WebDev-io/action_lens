@@ -58,11 +58,10 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
       <div className="flex items-center justify-center gap-2 mb-5 sm:mb-6 max-w-md mx-auto">
         <button
           onClick={() => setActiveTab('upload')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs font-semibold transition ${
-            activeTab === 'upload'
-              ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
-              : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
-          }`}
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs font-semibold transition ${activeTab === 'upload'
+            ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
+            : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
+            }`}
         >
           <UploadCloud className="h-4 w-4 shrink-0" />
           <span>Upload PDF Notice</span>
@@ -70,11 +69,10 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
 
         <button
           onClick={() => setActiveTab('text')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs font-semibold transition ${
-            activeTab === 'text'
-              ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
-              : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
-          }`}
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs font-semibold transition ${activeTab === 'text'
+            ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
+            : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
+            }`}
         >
           <Clipboard className="h-4 w-4 shrink-0" />
           <span>Paste Text</span>
@@ -88,11 +86,10 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 sm:p-10 text-center transition-all shadow-sm ${
-            isDragging
-              ? 'border-sky-500 bg-sky-50/60 shadow-lg shadow-sky-500/10'
-              : 'border-slate-300 bg-white hover:border-sky-500 hover:bg-slate-50/60'
-          }`}
+          className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 sm:p-10 text-center transition-all shadow-sm ${isDragging
+            ? 'border-sky-500 bg-sky-50/60 shadow-lg shadow-sky-500/10'
+            : 'border-slate-300 bg-white hover:border-sky-500 hover:bg-slate-50/60'
+            }`}
         >
           <input
             ref={fileInputRef}
