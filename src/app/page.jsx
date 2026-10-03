@@ -178,32 +178,61 @@ export default function Home() {
           <div className="space-y-6">
             <PlanHeader plan={plan} onReset={handleReset} />
 
-            {/* 6 Action Pillars Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Actions & Dependencies */}
-              <div className="lg:col-span-7 space-y-6">
-                <ActionChecklist
-                  actions={plan.actions}
-                  onToggle={handleToggleAction}
-                />
+            {/* Dynamic Result Layout: Only show sections that have data */}
+            {(() => {
+              const hasActions = Boolean(plan.actions && plan.actions.length > 0);
+              const hasDependencies = Boolean(plan.dependencies && plan.dependencies.length > 0);
+              const hasDeadlines = Boolean(plan.deadlines && plan.deadlines.length > 0);
+              const hasRequirements = Boolean(plan.requirements && plan.requirements.length > 0);
+              const hasWarnings = Boolean(plan.warnings && plan.warnings.length > 0);
 
-                <DependencyFlow dependencies={plan.dependencies} />
-              </div>
+              const hasLeft = hasActions || hasDependencies;
+              const hasRight = hasDeadlines || hasRequirements || hasWarnings;
 
-              {/* Right Column: Deadlines, Requirements, Warnings & Q&A */}
-              <div className="lg:col-span-5 space-y-6">
-                <DeadlinesView deadlines={plan.deadlines} />
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Primary Column */}
+                  <div className={hasRight ? 'lg:col-span-7 space-y-6' : 'lg:col-span-8 space-y-6'}>
+                    {hasActions && (
+                      <ActionChecklist
+                        actions={plan.actions}
+                        onToggle={handleToggleAction}
+                      />
+                    )}
 
-                <RequirementsView requirements={plan.requirements} />
+                    {hasDependencies && (
+                      <DependencyFlow dependencies={plan.dependencies} />
+                    )}
 
-                <WarningsView warnings={plan.warnings} />
+                    {!hasLeft && (
+                      <>
+                        {hasDeadlines && <DeadlinesView deadlines={plan.deadlines} />}
+                        {hasRequirements && <RequirementsView requirements={plan.requirements} />}
+                        {hasWarnings && <WarningsView warnings={plan.warnings} />}
+                      </>
+                    )}
+                  </div>
 
-                <DocumentChat
-                  documentText={rawText}
-                  suggestedQuestions={plan.suggestedQuestions}
-                />
-              </div>
-            </div>
+                  {/* Secondary Column */}
+                  <div className={hasRight ? 'lg:col-span-5 space-y-6' : 'lg:col-span-4 space-y-6'}>
+                    {hasLeft && (
+                      <>
+                        {hasDeadlines && <DeadlinesView deadlines={plan.deadlines} />}
+                        {hasRequirements && <RequirementsView requirements={plan.requirements} />}
+                        {hasWarnings && <WarningsView warnings={plan.warnings} />}
+                      </>
+                    )}
+
+                    {rawText && (
+                      <DocumentChat
+                        documentText={rawText}
+                        suggestedQuestions={plan.suggestedQuestions}
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </main>

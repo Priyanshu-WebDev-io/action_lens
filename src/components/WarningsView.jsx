@@ -2,6 +2,10 @@ import React from 'react';
 import { AlertOctagon, AlertTriangle, Info } from 'lucide-react';
 
 export default function WarningsView({ warnings = [] }) {
+  if (!warnings || warnings.length === 0) {
+    return null;
+  }
+
   const getSeverityStyle = (sev) => {
     switch (sev) {
       case 'critical':
@@ -36,36 +40,32 @@ export default function WarningsView({ warnings = [] }) {
       </div>
 
       <div className="space-y-3">
-        {warnings.length === 0 ? (
-          <p className="text-xs text-slate-500 py-4 text-center">No explicit penalties or warnings found.</p>
-        ) : (
-          warnings.map((w) => {
-            const style = getSeverityStyle(w.severity);
-            return (
-              <div
-                key={w.id}
-                className={`rounded-xl border p-3.5 transition ${style.card}`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5">{style.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-xs font-semibold text-slate-100">{w.title}</h4>
-                      <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${style.badge}`}>
-                        {w.severity}
-                      </span>
-                    </div>
-                    {w.consequence && (
-                      <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                        {w.consequence}
-                      </p>
-                    )}
+        {warnings.map((w, index) => {
+          const style = getSeverityStyle(w.severity);
+          return (
+            <div
+              key={w.id || index}
+              className={`rounded-xl border p-3.5 transition ${style.card}`}
+            >
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5">{style.icon}</div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-xs font-semibold text-slate-100">{w.title}</h4>
+                    <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${style.badge}`}>
+                      {w.severity}
+                    </span>
                   </div>
+                  {w.consequence && (
+                    <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                      {w.consequence}
+                    </p>
+                  )}
                 </div>
               </div>
-            );
-          })
-        )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -118,28 +118,44 @@ export default function PlanHeader({ plan, onReset }) {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/5">
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-          <div className="text-[11px] text-slate-400 font-medium">Action Tasks</div>
-          <div className="text-lg font-bold text-white mt-0.5">{plan.actions?.length || 0}</div>
-        </div>
+      {/* Dynamic Metrics Row: only show sections that have results */}
+      {(() => {
+        const metrics = [
+          plan.actions?.length > 0 && {
+            label: 'Action Tasks',
+            value: plan.actions.length,
+            color: 'text-white',
+          },
+          plan.deadlines?.length > 0 && {
+            label: 'Key Deadlines',
+            value: plan.deadlines.length,
+            color: 'text-sky-400',
+          },
+          plan.requirements?.length > 0 && {
+            label: 'Required Proofs',
+            value: plan.requirements.length,
+            color: 'text-amber-400',
+          },
+          plan.warnings?.length > 0 && {
+            label: 'Risk Callouts',
+            value: plan.warnings.length,
+            color: 'text-rose-400',
+          },
+        ].filter(Boolean);
 
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-          <div className="text-[11px] text-slate-400 font-medium">Key Deadlines</div>
-          <div className="text-lg font-bold text-sky-400 mt-0.5">{plan.deadlines?.length || 0}</div>
-        </div>
+        if (metrics.length === 0) return null;
 
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-          <div className="text-[11px] text-slate-400 font-medium">Required Proofs</div>
-          <div className="text-lg font-bold text-amber-400 mt-0.5">{plan.requirements?.length || 0}</div>
-        </div>
-
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-          <div className="text-[11px] text-slate-400 font-medium">Risk Callouts</div>
-          <div className="text-lg font-bold text-rose-400 mt-0.5">{plan.warnings?.length || 0}</div>
-        </div>
-      </div>
+        return (
+          <div className="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-white/5">
+            {metrics.map((m) => (
+              <div key={m.label} className="min-w-[130px] flex-1 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <div className="text-[11px] text-slate-400 font-medium">{m.label}</div>
+                <div className={`text-lg font-bold mt-0.5 ${m.color}`}>{m.value}</div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }

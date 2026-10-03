@@ -4,6 +4,10 @@ import React, { useState } from 'react';
 import { Check, Clock, Tag, AlertCircle, Filter } from 'lucide-react';
 
 export default function ActionChecklist({ actions = [], onToggle }) {
+  if (!actions || actions.length === 0) {
+    return null;
+  }
+
   const [filter, setFilter] = useState('all'); // 'all' | 'high' | 'pending' | 'completed'
 
   const completedCount = actions.filter((a) => a.isCompleted).length;
