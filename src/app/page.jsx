@@ -273,11 +273,12 @@ export default function Home() {
                   </div>
 
                   {/* Below Cards: Dedicated Document Chat for Custom Inquiries */}
-                  {rawText && (
+                  {(rawText || plan) && (
                     <div className="mt-8 pt-4 border-t border-slate-200">
                       <DocumentChat
                         documentText={rawText}
-                        suggestedQuestions={plan.suggestedQuestions}
+                        plan={plan}
+                        suggestedQuestions={plan.suggestedQuestions || []}
                       />
                     </div>
                   )}

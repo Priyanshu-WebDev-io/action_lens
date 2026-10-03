@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, Bot, User, Sparkles, Loader2, Copy, Check, RotateCcw } from 'lucide-react';
 
-export default function DocumentChat({ documentText, suggestedQuestions = [] }) {
+export default function DocumentChat({ documentText, plan, suggestedQuestions = [] }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -38,8 +38,10 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          documentText,
+          documentText: documentText || '',
           question: query,
+          conversationHistory: newMessages.slice(-6),
+          plan: plan || null,
         }),
       });
 
@@ -138,13 +140,13 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
 
             <div className="relative group max-w-[85%]">
               <div
-                className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-wrap ${
+                className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed ${
                   m.role === 'user'
-                    ? 'bg-sky-600 text-white shadow-sm'
+                    ? 'bg-sky-600 text-white shadow-sm whitespace-pre-wrap'
                     : 'bg-slate-50 border border-slate-200 text-slate-800'
                 }`}
               >
-                {m.content}
+                <FormattedContent content={m.content} isUser={m.role === 'user'} />
               </div>
 
               {m.role === 'assistant' && idx > 0 && (
@@ -207,3 +209,111 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
     </div>
   );
 }
+
+function renderInline(text) {
+  if (!text) return '';
+  const parts = [];
+  let remaining = text;
+  let key = 0;
+
+  while (remaining.length > 0) {
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+    const codeMatch = remaining.match(/`(.+?)`/);
+
+    let firstMatch = null;
+    let matchType = null;
+
+    if (boldMatch && codeMatch) {
+      if (boldMatch.index < codeMatch.index) {
+        firstMatch = boldMatch;
+        matchType = 'bold';
+      } else {
+        firstMatch = codeMatch;
+        matchType = 'code';
+      }
+    } else if (boldMatch) {
+      firstMatch = boldMatch;
+      matchType = 'bold';
+    } else if (codeMatch) {
+      firstMatch = codeMatch;
+      matchType = 'code';
+    }
+
+    if (!firstMatch) {
+      parts.push(remaining);
+      break;
+    }
+
+    if (firstMatch.index > 0) {
+      parts.push(remaining.substring(0, firstMatch.index));
+    }
+
+    if (matchType === 'bold') {
+      parts.push(
+        <strong key={key++} className="font-semibold text-slate-900">
+          {firstMatch[1]}
+        </strong>
+      );
+    } else if (matchType === 'code') {
+      parts.push(
+        <code
+          key={key++}
+          className="rounded bg-slate-200/70 px-1 py-0.5 font-mono text-[11px] text-sky-800"
+        >
+          {firstMatch[1]}
+        </code>
+      );
+    }
+
+    remaining = remaining.substring(firstMatch.index + firstMatch[0].length);
+  }
+
+  return parts;
+}
+
+function FormattedContent({ content, isUser }) {
+  if (isUser) {
+    return <div className="text-xs leading-relaxed whitespace-pre-wrap">{content}</div>;
+  }
+
+  const lines = (content || '').split('\n');
+  return (
+    <div className="text-xs leading-relaxed text-slate-800 space-y-1.5">
+      {lines.map((line, lineIdx) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={lineIdx} className="h-1" />;
+        }
+
+        if (
+          trimmed.startsWith('• ') ||
+          trimmed.startsWith('- ') ||
+          trimmed.startsWith('* ')
+        ) {
+          const bulletText = trimmed.replace(/^[•\-\*]\s+/, '');
+          return (
+            <div key={lineIdx} className="flex items-start gap-1.5 ml-1">
+              <span className="text-sky-600 font-bold shrink-0 leading-relaxed">•</span>
+              <div className="flex-1">{renderInline(bulletText)}</div>
+            </div>
+          );
+        }
+
+        if (trimmed.startsWith('> ')) {
+          const quoteText = trimmed.slice(2);
+          return (
+            <div
+              key={lineIdx}
+              className="border-l-2 border-sky-400 pl-2.5 py-1 my-1 text-slate-700 italic bg-sky-50/60 rounded-r"
+            >
+              {renderInline(quoteText)}
+            </div>
+          );
+        }
+
+        return <p key={lineIdx}>{renderInline(trimmed)}</p>;
+      })}
+    </div>
+  );
+}
+

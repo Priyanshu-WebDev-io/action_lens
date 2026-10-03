@@ -25,9 +25,6 @@ export default function Navbar({ onReset, hasDocument, documentTitle }) {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold tracking-tight text-slate-900">ActionLens</span>
-              <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700 border border-sky-200">
-                Gemma 4
-              </span>
             </div>
           </div>
         </div>

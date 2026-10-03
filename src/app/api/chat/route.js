@@ -5,13 +5,18 @@ export const runtime = 'nodejs';
 
 export async function POST(request) {
   try {
-    const { documentText, question } = await request.json();
+    const { documentText, question, conversationHistory, plan } = await request.json();
 
     if (!question || !question.trim()) {
       return NextResponse.json({ success: false, error: 'Question is required' }, { status: 400 });
     }
 
-    const answer = await askDocumentQuestion(documentText || '', question);
+    const answer = await askDocumentQuestion(
+      documentText || '',
+      question,
+      conversationHistory || [],
+      plan || null
+    );
 
     return NextResponse.json({
       success: true,

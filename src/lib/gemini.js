@@ -1,5 +1,5 @@
-import { ActionPlanSchema } from './schema';
-import { SAMPLE_DOCUMENTS } from './sampleData';
+import { ActionPlanSchema } from './schema.js';
+import { SAMPLE_DOCUMENTS } from './sampleData.js';
 
 /**
  * Extracts raw text or structured markdown from a PDF buffer.
@@ -110,10 +110,10 @@ Output ONLY a valid, clean JSON object matching this schema:
       "items": [{ "id": string, "label": string, "value": string, "tag": string }]
     }
   ],
-  "suggestedQuestions": [string]
+  "suggestedQuestions": [string] // 3 to 4 insightful, specific questions that ARE DIRECTLY AND ACCURATELY ANSWERED by the text of this document (e.g. key deadlines, mandatory steps, eligibility rules, penalties). CRITICAL: Every suggested question MUST be answerable from the document facts. Do NOT suggest questions whose answers are missing from the document.
 }
 
-Note: If a section has no relevant data in the document (e.g. no deadlines, or no required physical documents), leave that array empty ([]). Never hallucinate or add filler content.`;
+Note: If a section has no relevant data in the document (e.g. no deadlines, or no required physical documents), leave that array empty ([]). Never hallucinate or add filler content. Suggested questions must only ask about information actually present in the text.`;
 
   const prompt = `Analyze this document and extract the customized ActionLens plan with tailored section titles:
 
@@ -187,40 +187,144 @@ Output pure JSON only, without any markdown backticks or commentary.`;
 }
 
 /**
- * Answers questions strictly grounded in the document context.
+ * Answers questions strictly grounded in the document context and extracted action plan.
  */
-export async function askDocumentQuestion(documentText, question, conversationHistory = []) {
+export async function askDocumentQuestion(
+  documentText,
+  question,
+  conversationHistory = [],
+  plan = null
+) {
   const apiKey = process.env.GEMINI_API_KEY;
-  const modelName = process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash';
 
-  if (!apiKey) {
-    // Intelligent heuristic answer for demo mode
-    const qLower = question.toLowerCase();
-    if (qLower.includes('library') || qLower.includes('first')) {
-      return 'You must complete your Central Library clearance first. The circular explicitly states that students without library clearance will be locked out of the examination portal.';
+  // Build structured overview from plan if provided
+  let structuredContext = '';
+  if (plan) {
+    const parts = [];
+    if (plan.documentTitle) parts.push(`DOCUMENT TITLE: ${plan.documentTitle}`);
+    if (plan.documentType) parts.push(`DOCUMENT TYPE: ${plan.documentType}`);
+    if (plan.summary) parts.push(`DOCUMENT SUMMARY: ${plan.summary}`);
+
+    if (plan.actions && plan.actions.length > 0) {
+      const actList = plan.actions
+        .map(
+          (a, i) =>
+            `${i + 1}. [${(a.priority || 'medium').toUpperCase()}] ${a.title}: ${a.description || ''}${
+              a.estimatedTime ? ` (${a.estimatedTime})` : ''
+            }`
+        )
+        .join('\n');
+      parts.push(`KEY ACTION ITEMS:\n${actList}`);
     }
-    if (qLower.includes('deadline') || qLower.includes('october') || qLower.includes('when')) {
-      return 'The regular submission deadline is October 25, 2026 (5:00 PM IST). Late submissions are accepted until October 28, 2026 with a ₹500 fine.';
+
+    if (plan.deadlines && plan.deadlines.length > 0) {
+      const dlList = plan.deadlines
+        .map(
+          (d, i) =>
+            `${i + 1}. ${d.title} — ${d.date}${d.time ? ` at ${d.time}` : ''}${
+              d.notes ? ` (${d.notes})` : ''
+            }`
+        )
+        .join('\n');
+      parts.push(`DEADLINES & SCHEDULE CUTOFFS:\n${dlList}`);
     }
-    if (qLower.includes('document') || qLower.includes('upload') || qLower.includes('photo')) {
-      return 'Mandatory uploads include: Scanned Student ID (PDF < 500KB), Passport-size photo (JPEG < 100KB), Specimen signature (JPEG < 50KB), and Exam fee receipt.';
+
+    if (plan.requirements && plan.requirements.length > 0) {
+      const reqList = plan.requirements
+        .map(
+          (r, i) =>
+            `${i + 1}. ${r.name} (${r.format || 'Standard'})${r.details ? `: ${r.details}` : ''}${
+              r.mandatory ? ' [MANDATORY]' : ''
+            }`
+        )
+        .join('\n');
+      parts.push(`REQUIREMENTS & SPECIFICATIONS:\n${reqList}`);
     }
-    return `Based on the document: Please review the circular instructions regarding "${question}". Make sure all prerequisites are verified before submitting.`;
+
+    if (plan.dependencies && plan.dependencies.length > 0) {
+      const depList = plan.dependencies
+        .map(
+          (dp) =>
+            `Step ${dp.stepNumber}: ${dp.title} -> Prerequisite for: ${
+              dp.prerequisiteFor || 'Next step'
+            }. Details: ${dp.details || ''}`
+        )
+        .join('\n');
+      parts.push(`WORKFLOW SEQUENCE & PREREQUISITES:\n${depList}`);
+    }
+
+    if (plan.warnings && plan.warnings.length > 0) {
+      const warnList = plan.warnings
+        .map(
+          (w, i) =>
+            `${i + 1}. [${(w.severity || 'warning').toUpperCase()}] ${w.title}: ${w.consequence || ''}`
+        )
+        .join('\n');
+      parts.push(`IMPORTANT RULES, WARNINGS & PENALTIES:\n${warnList}`);
+    }
+
+    if (plan.customSections && plan.customSections.length > 0) {
+      const customList = plan.customSections
+        .map(
+          (cs) =>
+            `${cs.title}:\n` +
+            cs.items.map((it) => `  - ${it.label}: ${it.value}${it.tag ? ` [${it.tag}]` : ''}`).join('\n')
+        )
+        .join('\n');
+      parts.push(`ADDITIONAL DETAILS:\n${customList}`);
+    }
+
+    structuredContext = parts.join('\n\n');
   }
 
-  const systemPrompt = `You are ActionLens Copilot. You answer user queries about the document accurately and concisely.
-Rules:
-1. Answer ONLY using the facts stated in the provided document.
-2. If the document does not mention the answer, state clearly: "This document does not specify this information."
-3. Keep answers direct, friendly, and free of filler words.`;
+  // If no API key is available, use our intelligent heuristic grounding engine
+  if (!apiKey) {
+    return generateHeuristicChatAnswer(documentText, question, plan);
+  }
 
-  const userPrompt = `DOCUMENT TEXT:
-${documentText.slice(0, 12000)}
+  const systemPrompt = `You are ActionLens Copilot, an expert AI assistant dedicated to helping users understand, navigate, and take action on the provided document and circular.
+
+Your core guidelines:
+1. Grounded & Accurate:
+   - Base your answer on the facts, guidelines, dates, requirements, and context found in the provided document text and extracted plan.
+   - Do NOT invent or hallucinate rules, deadlines, or requirements not present in the document.
+
+2. Comprehensive, Helpful & Nuanced:
+   - When the user asks about facts, rules, dates, or guidelines mentioned in the document, explain the specifics thoroughly and cite context.
+   - If a specific sub-detail is not explicitly detailed in the document (for instance, if the document mentions an event in Asansol and gives dates/timings, but does not name a specific campus hall or room):
+     * State clearly what the document DOES specify about that topic (e.g. city, dates, schedule, or reporting instructions).
+     * Clarify what specific detail is not stated in this notice.
+     * Suggest next steps (e.g. check the official event portal, confirmation email, or coordinator desk).
+     * NEVER give a blunt, one-sentence refusal like "This document does not specify this information." Always be helpful, polite, and constructive.
+
+3. Formatting:
+   - Format answers using clean Markdown.
+   - Use bold (**text**) for key terms, dates, and names.
+   - Use bullet points (- or *) for lists or steps.
+   - Keep answers clear, structured, and easy to skim.`;
+
+  // Build conversational history if available
+  let historySection = '';
+  if (Array.isArray(conversationHistory) && conversationHistory.length > 0) {
+    const recent = conversationHistory
+      .filter((m) => m && m.content && (m.role === 'user' || m.role === 'assistant'))
+      .slice(-6);
+    if (recent.length > 0) {
+      historySection = `CONVERSATION HISTORY:\n${recent
+        .map((m) => `${m.role === 'user' ? 'User' : 'Copilot'}: ${m.content}`)
+        .join('\n')}\n\n`;
+    }
+  }
+
+  const userPrompt = `${historySection}${
+    structuredContext ? `EXTRACTED ACTION PLAN & CONTEXT:\n${structuredContext}\n\n` : ''
+  }ORIGINAL DOCUMENT TEXT:
+${documentText ? documentText.slice(0, 15000) : 'None provided.'}
 
 USER QUESTION:
 ${question}
 
-Provide a direct, helpful answer:`;
+Provide an accurate, grounded, helpful answer:`;
 
   const candidateModels = Array.from(
     new Set([
@@ -245,12 +349,14 @@ Provide a direct, helpful answer:`;
           ],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 600,
+            maxOutputTokens: 800,
           },
         }),
       });
 
       if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`Chat attempt with ${model} returned ${response.status}: ${errText}`);
         continue;
       }
 
@@ -258,11 +364,148 @@ Provide a direct, helpful answer:`;
       const answer = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       if (answer) return answer;
     } catch (err) {
-      console.warn(`Chat attempt with ${model} failed, trying next candidate...`);
+      console.warn(`Chat attempt with ${model} failed: ${err.message}, trying next candidate...`);
     }
   }
 
-  return 'Unable to contact Gemma AI at the moment. Please try again.';
+  // If external API failed or timed out, gracefully fallback to heuristic answer
+  return generateHeuristicChatAnswer(documentText, question, plan);
+}
+
+/**
+ * Intelligent heuristic fallback grounded in document facts and action plan
+ */
+function generateHeuristicChatAnswer(documentText = '', question = '', plan = null) {
+  const qLower = question.toLowerCase();
+
+  // 1. Check for deadline queries
+  if (
+    qLower.includes('deadline') ||
+    qLower.includes('date') ||
+    qLower.includes('when') ||
+    qLower.includes('time') ||
+    qLower.includes('cutoff')
+  ) {
+    if (plan?.deadlines && plan.deadlines.length > 0) {
+      const items = plan.deadlines
+        .map(
+          (d) =>
+            `• **${d.title}**: ${d.date}${d.time ? ` at ${d.time}` : ''}${
+              d.notes ? ` (${d.notes})` : ''
+            }`
+        )
+        .join('\n');
+      return `Here are the deadlines identified in the document:\n\n${items}`;
+    }
+  }
+
+  // 2. Check for action items / tasks / steps
+  if (
+    qLower.includes('what should i do') ||
+    qLower.includes('task') ||
+    qLower.includes('action') ||
+    qLower.includes('steps') ||
+    qLower.includes('how to')
+  ) {
+    if (plan?.actions && plan.actions.length > 0) {
+      const items = plan.actions
+        .map(
+          (a) =>
+            `• **${a.title}** (${a.priority} priority): ${a.description}${
+              a.estimatedTime ? ` [Est: ${a.estimatedTime}]` : ''
+            }`
+        )
+        .join('\n');
+      return `Here are the key action steps required by this document:\n\n${items}`;
+    }
+    if (plan?.dependencies && plan.dependencies.length > 0) {
+      const items = plan.dependencies
+        .map(
+          (d) =>
+            `• **Step ${d.stepNumber} - ${d.title}**: Prerequisite for ${d.prerequisiteFor}. ${d.details}`
+        )
+        .join('\n');
+      return `Here is the required sequence of steps:\n\n${items}`;
+    }
+  }
+
+  // 3. Check for documents / uploads / requirements / proof
+  if (
+    qLower.includes('document') ||
+    qLower.includes('upload') ||
+    qLower.includes('photo') ||
+    qLower.includes('file') ||
+    qLower.includes('requirement') ||
+    qLower.includes('spec')
+  ) {
+    if (plan?.requirements && plan.requirements.length > 0) {
+      const items = plan.requirements
+        .map(
+          (r) =>
+            `• **${r.name}** (${r.format || 'Standard'}): ${r.details || 'Required for submission'}${
+              r.mandatory ? ' [Mandatory]' : ''
+            }`
+        )
+        .join('\n');
+      return `The document outlines the following required items and specifications:\n\n${items}`;
+    }
+  }
+
+  // 4. Check for warnings, penalties, fines, late fees, disqualification
+  if (
+    qLower.includes('warning') ||
+    qLower.includes('penalty') ||
+    qLower.includes('fine') ||
+    qLower.includes('late') ||
+    qLower.includes('disqualif') ||
+    qLower.includes('risk')
+  ) {
+    if (plan?.warnings && plan.warnings.length > 0) {
+      const items = plan.warnings.map((w) => `• **${w.title}**: ${w.consequence}`).join('\n');
+      return `Important warnings and rule advisories mentioned in the document:\n\n${items}`;
+    }
+  }
+
+  // 5. Keyword search in documentText
+  if (documentText) {
+    const stopwords = [
+      'what', 'when', 'where', 'which', 'about', 'this', 'that', 'with', 'from',
+      'have', 'does', 'will', 'your', 'under', 'within', 'there', 'please'
+    ];
+    const words = qLower
+      .replace(/[^a-z0-9\s]/g, '')
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !stopwords.includes(w));
+
+    if (words.length > 0) {
+      const sentences = documentText
+        .split(/[.\n]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const scored = sentences
+        .map((s) => {
+          const sLower = s.toLowerCase();
+          const score = words.filter((w) => sLower.includes(w)).length;
+          return { text: s, score };
+        })
+        .filter((item) => item.score > 0);
+
+      scored.sort((a, b) => b.score - a.score);
+
+      if (scored.length > 0) {
+        const excerpt = scored.slice(0, 3).map((m) => `> ${m.text}`).join('\n\n');
+        return `Based on the document regarding your question:\n\n${excerpt}\n\n*Please refer to the full notice or reach out to the organizing authority for further unstated details.*`;
+      }
+    }
+  }
+
+  // 6. General grounded summary fallback
+  if (plan?.summary) {
+    return `According to the document **${plan.documentTitle || 'Notice'}**:\n\n${plan.summary}\n\nIf you need specific details about rules, deadlines, or prerequisites, feel free to ask!`;
+  }
+
+  return `Based on this document, please check the extracted action checklist and deadlines above for relevant instructions regarding "${question}".`;
 }
 
 /**
