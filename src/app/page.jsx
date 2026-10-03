@@ -10,6 +10,7 @@ import DeadlinesView from '@/components/DeadlinesView';
 import RequirementsView from '@/components/RequirementsView';
 import DependencyFlow from '@/components/DependencyFlow';
 import WarningsView from '@/components/WarningsView';
+import CustomSectionsView from '@/components/CustomSectionsView';
 import DocumentChat from '@/components/DocumentChat';
 
 export default function Home() {
@@ -29,7 +30,7 @@ export default function Home() {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Simulate realistic step updates for high UX polish
+      // Smooth step updates for polished UX
       const timer1 = setTimeout(() => setProcessingStep(2), 700);
       const timer2 = setTimeout(() => setProcessingStep(3), 1600);
 
@@ -178,58 +179,108 @@ export default function Home() {
           <div className="space-y-6">
             <PlanHeader plan={plan} onReset={handleReset} />
 
-            {/* Dynamic Result Layout: Only show sections that have data */}
+            {/* Dynamic Results Grid */}
             {(() => {
               const hasActions = Boolean(plan.actions && plan.actions.length > 0);
               const hasDependencies = Boolean(plan.dependencies && plan.dependencies.length > 0);
               const hasDeadlines = Boolean(plan.deadlines && plan.deadlines.length > 0);
               const hasRequirements = Boolean(plan.requirements && plan.requirements.length > 0);
               const hasWarnings = Boolean(plan.warnings && plan.warnings.length > 0);
+              const hasCustom = Boolean(plan.customSections && plan.customSections.length > 0);
 
               const hasLeft = hasActions || hasDependencies;
-              const hasRight = hasDeadlines || hasRequirements || hasWarnings;
+              const hasRight = hasDeadlines || hasRequirements || hasWarnings || hasCustom;
+
+              const headings = plan.sectionHeadings || {};
 
               return (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* Primary Column */}
-                  <div className={hasRight ? 'lg:col-span-7 space-y-6' : 'lg:col-span-8 space-y-6'}>
-                    {hasActions && (
-                      <ActionChecklist
-                        actions={plan.actions}
-                        onToggle={handleToggleAction}
-                      />
-                    )}
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Primary Column */}
+                    <div className={hasRight ? 'lg:col-span-7 space-y-6' : 'lg:col-span-12 space-y-6'}>
+                      {hasActions && (
+                        <ActionChecklist
+                          actions={plan.actions}
+                          onToggle={handleToggleAction}
+                          title={headings.actions?.title}
+                          subtitle={headings.actions?.subtitle}
+                        />
+                      )}
 
-                    {hasDependencies && (
-                      <DependencyFlow dependencies={plan.dependencies} />
-                    )}
+                      {hasDependencies && (
+                        <DependencyFlow
+                          dependencies={plan.dependencies}
+                          title={headings.dependencies?.title}
+                          subtitle={headings.dependencies?.subtitle}
+                        />
+                      )}
 
-                    {!hasLeft && (
-                      <>
-                        {hasDeadlines && <DeadlinesView deadlines={plan.deadlines} />}
-                        {hasRequirements && <RequirementsView requirements={plan.requirements} />}
-                        {hasWarnings && <WarningsView warnings={plan.warnings} />}
-                      </>
+                      {!hasLeft && (
+                        <>
+                          {hasDeadlines && (
+                            <DeadlinesView
+                              deadlines={plan.deadlines}
+                              title={headings.deadlines?.title}
+                              subtitle={headings.deadlines?.subtitle}
+                            />
+                          )}
+                          {hasRequirements && (
+                            <RequirementsView
+                              requirements={plan.requirements}
+                              title={headings.requirements?.title}
+                              subtitle={headings.requirements?.subtitle}
+                            />
+                          )}
+                          {hasWarnings && (
+                            <WarningsView
+                              warnings={plan.warnings}
+                              title={headings.warnings?.title}
+                              subtitle={headings.warnings?.subtitle}
+                            />
+                          )}
+                          {hasCustom && <CustomSectionsView customSections={plan.customSections} />}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Secondary Column */}
+                    {hasRight && hasLeft && (
+                      <div className="lg:col-span-5 space-y-6">
+                        {hasDeadlines && (
+                          <DeadlinesView
+                            deadlines={plan.deadlines}
+                            title={headings.deadlines?.title}
+                            subtitle={headings.deadlines?.subtitle}
+                          />
+                        )}
+                        {hasRequirements && (
+                          <RequirementsView
+                            requirements={plan.requirements}
+                            title={headings.requirements?.title}
+                            subtitle={headings.requirements?.subtitle}
+                          />
+                        )}
+                        {hasWarnings && (
+                          <WarningsView
+                            warnings={plan.warnings}
+                            title={headings.warnings?.title}
+                            subtitle={headings.warnings?.subtitle}
+                          />
+                        )}
+                        {hasCustom && <CustomSectionsView customSections={plan.customSections} />}
+                      </div>
                     )}
                   </div>
 
-                  {/* Secondary Column */}
-                  <div className={hasRight ? 'lg:col-span-5 space-y-6' : 'lg:col-span-4 space-y-6'}>
-                    {hasLeft && (
-                      <>
-                        {hasDeadlines && <DeadlinesView deadlines={plan.deadlines} />}
-                        {hasRequirements && <RequirementsView requirements={plan.requirements} />}
-                        {hasWarnings && <WarningsView warnings={plan.warnings} />}
-                      </>
-                    )}
-
-                    {rawText && (
+                  {/* Below Cards: Dedicated Document Chat for Custom Inquiries */}
+                  {rawText && (
+                    <div className="mt-8 pt-4 border-t border-white/5">
                       <DocumentChat
                         documentText={rawText}
                         suggestedQuestions={plan.suggestedQuestions}
                       />
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}

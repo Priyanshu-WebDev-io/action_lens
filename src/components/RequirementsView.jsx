@@ -1,7 +1,11 @@
 import React from 'react';
 import { Paperclip, FileCheck } from 'lucide-react';
 
-export default function RequirementsView({ requirements = [] }) {
+export default function RequirementsView({
+  requirements = [],
+  title = 'Required Documents & Proofs',
+  subtitle = 'Physical and digital assets you must assemble',
+}) {
   if (!requirements || requirements.length === 0) {
     return null;
   }
@@ -11,9 +15,9 @@ export default function RequirementsView({ requirements = [] }) {
       <div className="border-b border-white/5 pb-3 mb-4">
         <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
           <Paperclip className="h-4 w-4 text-sky-400" />
-          <span>Required Documents & Proofs</span>
+          <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-0.5">Physical and digital assets you must assemble</p>
+        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

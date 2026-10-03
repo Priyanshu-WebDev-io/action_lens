@@ -1,7 +1,11 @@
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
 
-export default function DeadlinesView({ deadlines = [] }) {
+export default function DeadlinesView({
+  deadlines = [],
+  title = 'Deadlines & Cutoffs',
+  subtitle = 'Critical dates and milestone cutoffs from the notice',
+}) {
   if (!deadlines || deadlines.length === 0) {
     return null;
   }
@@ -11,9 +15,9 @@ export default function DeadlinesView({ deadlines = [] }) {
       <div className="border-b border-white/5 pb-3 mb-4">
         <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
           <Calendar className="h-4 w-4 text-sky-400" />
-          <span>Deadlines & Cutoffs</span>
+          <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-0.5">Critical dates and milestone cutoffs from the notice</p>
+        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
       </div>
 
       <div className="space-y-3">

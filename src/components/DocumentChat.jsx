@@ -1,18 +1,19 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
+import { MessageSquare, Send, Bot, User, Sparkles, Loader2, Copy, Check, RotateCcw } from 'lucide-react';
 
 export default function DocumentChat({ documentText, suggestedQuestions = [] }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
       content:
-        'I am ActionLens Copilot. Ask any question about this document, its deadlines, prerequisites, or upload specs.',
+        'I am ActionLens Copilot. Ask any question about this document, its rules, deadlines, or specifics.',
     },
   ]);
   const [input, setInput] = useState('');
   const [isAsking, setIsAsking] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -61,14 +62,43 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
     }
   };
 
+  const handleCopy = (text, idx) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
+
+  const handleClear = () => {
+    setMessages([
+      {
+        role: 'assistant',
+        content:
+          'I am ActionLens Copilot. Ask any question about this document, its rules, deadlines, or specifics.',
+      },
+    ]);
+  };
+
   return (
     <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-5 backdrop-blur-sm flex flex-col h-[520px]">
-      <div className="border-b border-white/5 pb-3 mb-3 shrink-0">
-        <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-sky-400" />
-          <span>Ask The Document</span>
-        </h2>
-        <p className="text-xs text-slate-400 mt-0.5">Instant grounded answers verified by Google Gemma</p>
+      <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3 shrink-0">
+        <div>
+          <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-sky-400" />
+            <span>Ask The Document</span>
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">Instant grounded answers verified by Google Gemma</p>
+        </div>
+
+        {messages.length > 1 && (
+          <button
+            onClick={handleClear}
+            className="flex items-center gap-1 rounded bg-white/5 px-2 py-1 text-[11px] text-slate-400 hover:text-white hover:bg-white/10 transition"
+            title="Reset conversation"
+          >
+            <RotateCcw className="h-3 w-3" />
+            <span>Reset</span>
+          </button>
+        )}
       </div>
 
       {/* Suggested Questions */}
@@ -106,14 +136,26 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
               </div>
             )}
 
-            <div
-              className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-xs leading-relaxed ${
-                m.role === 'user'
-                  ? 'bg-sky-500 text-white shadow-md shadow-sky-500/10'
-                  : 'bg-slate-900 border border-white/10 text-slate-200'
-              }`}
-            >
-              {m.content}
+            <div className="relative group max-w-[85%]">
+              <div
+                className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-wrap ${
+                  m.role === 'user'
+                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/10'
+                    : 'bg-slate-900 border border-white/10 text-slate-200'
+                }`}
+              >
+                {m.content}
+              </div>
+
+              {m.role === 'assistant' && idx > 0 && (
+                <button
+                  onClick={() => handleCopy(m.content, idx)}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition p-1 rounded bg-slate-800 text-slate-400 hover:text-white"
+                  title="Copy answer"
+                >
+                  {copiedIdx === idx ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                </button>
+              )}
             </div>
 
             {m.role === 'user' && (
@@ -131,7 +173,7 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
             </div>
             <div className="rounded-xl border border-white/10 bg-slate-900 px-3.5 py-2.5 text-xs text-slate-400 flex items-center gap-2">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-400" />
-              <span>Gemma is reading the document...</span>
+              <span>Gemma is reasoning over document facts...</span>
             </div>
           </div>
         )}
@@ -150,7 +192,7 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask anything about this circular..."
+          placeholder="Ask anything about this document..."
           disabled={isAsking}
           className="flex-1 rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
         />

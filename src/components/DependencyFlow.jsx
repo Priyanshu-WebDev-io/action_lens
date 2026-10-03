@@ -1,7 +1,11 @@
 import React from 'react';
 import { GitMerge, Lock } from 'lucide-react';
 
-export default function DependencyFlow({ dependencies = [] }) {
+export default function DependencyFlow({
+  dependencies = [],
+  title = 'Sequential Order & Dependencies',
+  subtitle = 'Complete tasks in this order to avoid portal locks or rejections',
+}) {
   if (!dependencies || dependencies.length === 0) {
     return null;
   }
@@ -13,9 +17,9 @@ export default function DependencyFlow({ dependencies = [] }) {
       <div className="border-b border-white/5 pb-3 mb-4">
         <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
           <GitMerge className="h-4 w-4 text-sky-400" />
-          <span>Sequential Order & Dependencies</span>
+          <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-0.5">Complete tasks in this order to avoid portal locks or rejections</p>
+        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
       </div>
 
       <div className="relative space-y-3">

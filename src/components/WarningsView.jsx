@@ -1,7 +1,11 @@
 import React from 'react';
 import { AlertOctagon, AlertTriangle, Info } from 'lucide-react';
 
-export default function WarningsView({ warnings = [] }) {
+export default function WarningsView({
+  warnings = [],
+  title = 'Important Advisories & Rules',
+  subtitle = 'Penalties, conditions, and closure notices',
+}) {
   if (!warnings || warnings.length === 0) {
     return null;
   }
@@ -34,9 +38,9 @@ export default function WarningsView({ warnings = [] }) {
       <div className="border-b border-white/5 pb-3 mb-4">
         <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
           <AlertOctagon className="h-4 w-4 text-rose-400" />
-          <span>Important Warnings & Risks</span>
+          <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-0.5">Penalties, disqualification clauses, and lockout risks</p>
+        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
       </div>
 
       <div className="space-y-3">

@@ -67,6 +67,14 @@ export default function PlanHeader({ plan, onReset }) {
               <CheckCircle2 className="h-3 w-3" />
               <span>Gemma Verified</span>
             </span>
+            {plan.tags?.map((tag, idx) => (
+              <span
+                key={idx}
+                className="rounded-md bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-300 border border-white/10"
+              >
+                #{tag}
+              </span>
+            ))}
           </div>
 
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2">

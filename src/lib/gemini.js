@@ -71,20 +71,22 @@ export async function generateActionPlanFromText(documentText, documentName = 'U
   }
 
   const systemInstruction = `You are ActionLens, a precise document-to-action reasoning engine powered by Google Gemma.
-Your job is NOT to summarize text. Your job is to transform dense circulars, notices, and rules into an actionable execution plan.
-You must extract 6 distinct dimensions:
-1. actions: specific, bite-sized tasks the user must DO (with category and priority).
-2. deadlines: hard cutoff dates, times, and rules.
-3. requirements: needed physical/digital items, specifications, formats (e.g. PDF < 500KB), fees.
-4. dependencies: ordered sequential prerequisites (e.g. Step 1 blocks Step 2).
-5. warnings: penalties, disqualification risks, late fee rules.
-6. suggestedQuestions: 3-4 natural follow-up questions someone would ask about this document.
+Your job is NOT to produce generic summaries. You transform dense documents into a tailored, actionable roadmap.
+Crucially, you must customize the section headings and subtitles to fit the EXACT context of the document (e.g. for a holiday notice use "Schedule Adjustments" or "Observance Timeline"; for an exam notice use "Candidate Checklist" or "Examination Cutoffs").
 
-You must respond ONLY with a valid, clean JSON object matching this schema:
+Output ONLY a valid, clean JSON object matching this schema:
 {
   "documentTitle": string,
   "documentType": string,
   "summary": string,
+  "tags": [string], // 2-4 contextual badges (e.g. ["Official Holiday", "Office Closure", "Operations"])
+  "sectionHeadings": {
+    "actions": { "title": string, "subtitle": string },
+    "deadlines": { "title": string, "subtitle": string },
+    "requirements": { "title": string, "subtitle": string },
+    "dependencies": { "title": string, "subtitle": string },
+    "warnings": { "title": string, "subtitle": string }
+  },
   "actions": [
     { "id": string, "title": string, "description": string, "category": string, "priority": "high"|"medium"|"low", "isCompleted": false, "estimatedTime": string }
   ],
@@ -100,10 +102,20 @@ You must respond ONLY with a valid, clean JSON object matching this schema:
   "warnings": [
     { "id": string, "title": string, "consequence": string, "severity": "critical"|"warning"|"info" }
   ],
+  "customSections": [
+    {
+      "id": string,
+      "title": string,
+      "subtitle": string,
+      "items": [{ "id": string, "label": string, "value": string, "tag": string }]
+    }
+  ],
   "suggestedQuestions": [string]
-}`;
+}
 
-  const prompt = `Analyze this document and extract the complete ActionLens plan:
+Note: If a section has no relevant data in the document (e.g. no deadlines, or no required physical documents), leave that array empty ([]). Never hallucinate or add filler content.`;
+
+  const prompt = `Analyze this document and extract the customized ActionLens plan with tailored section titles:
 
 DOCUMENT TITLE: ${documentName}
 

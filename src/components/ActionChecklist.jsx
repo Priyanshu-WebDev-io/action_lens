@@ -3,7 +3,12 @@
 import React, { useState } from 'react';
 import { Check, Clock, Tag, AlertCircle, Filter } from 'lucide-react';
 
-export default function ActionChecklist({ actions = [], onToggle }) {
+export default function ActionChecklist({
+  actions = [],
+  onToggle,
+  title = 'What You Need To Do',
+  subtitle = 'Click any task to track your progress',
+}) {
   if (!actions || actions.length === 0) {
     return null;
   }
@@ -38,12 +43,12 @@ export default function ActionChecklist({ actions = [], onToggle }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4 mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold tracking-tight text-white uppercase">What You Need To Do</h2>
+            <h2 className="text-sm font-bold tracking-tight text-white uppercase">{title}</h2>
             <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-400 border border-sky-500/20">
               {completedCount}/{totalCount} Completed
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">Click any task to track your progress</p>
+          <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
         </div>
 
         {/* Filter Pills */}
