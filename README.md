@@ -11,7 +11,7 @@
 [![Deploy with Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel&logoColor=white)](https://vercel.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**ActionLens** is an open-source multimodal AI tool that transforms dense, complicated documents, circulars, and notices into clear, ordered, deadline-aware action roadmaps. Built as a laser-focused, production-grade MVP for the 6-hour hackathon, ActionLens deploys seamlessly to Vercel without requiring custom VMs or GPU infrastructure.
+**ActionLens** is an open-source multimodal AI tool that transforms dense, complicated documents, circulars, and notices into clear, ordered, deadline-aware action roadmaps. Designed with a lean, serverless-first architecture, ActionLens runs entirely in the cloud and deploys seamlessly to Vercel without requiring dedicated VMs or complex GPU infrastructure.
 
 ---
 
@@ -31,7 +31,7 @@ Standard text summarizers simply shorten the text. But when users face real-worl
 
 ---
 
-## 🚀 Final MVP Tech Stack
+## 🚀 Tech Stack
 
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
@@ -42,8 +42,8 @@ Standard text summarizers simply shorten the text. But when users face real-worl
 | **AI Reasoning** | **Gemma 4 via Gemini API** | Understands rules, constraints, and extracts actions |
 | **Schema Validation** | **Zod** | Strictly validates Gemma's structured JSON output |
 | **State Management** | **React State** | Upload, processing stages, results, and chat state |
-| **Database** | **None** | Zero overhead; stateless for rapid execution |
-| **File Storage** | **None** | In-memory processing; PDFs are not persisted |
+| **Database** | **None (Stateless)** | Zero overhead; privacy-preserving instant execution |
+| **File Storage** | **None (In-Memory)** | In-memory processing; documents are never permanently stored |
 | **Deployment** | **Vercel** | Single-click unified frontend + serverless backend |
 | **Version Control** | **Git + GitHub** | Open source repository & issue tracking |
 
@@ -109,7 +109,7 @@ Standard text summarizers simply shorten the text. But when users face real-worl
 
 ## 🎯 The Core Engineering Challenge
 
-The hackathon isn't about building bloated, unnecessary infrastructure. It's about perfecting this high-leverage pipeline:
+Rather than relying on bloated, heavyweight infrastructure, ActionLens is designed around a single, highly refined reasoning pipeline:
 
 ```text
        PDF
@@ -135,10 +135,10 @@ The hackathon isn't about building bloated, unnecessary infrastructure. It's abo
 
 ---
 
-## 📦 MVP Scope
+## 📦 Capabilities & Scope
 
 ### 📥 Input
-**PDF only**, including:
+**PDF documents**, including:
 - 🎓 College & university circulars
 - 📝 Examination & registration notices
 - 💰 Scholarship & financial aid applications
@@ -197,26 +197,20 @@ Gemma:  "You must obtain library clearance first. The circular states that stude
 
 ---
 
-## ❌ What We Are NOT Building (Hackathon Anti-Scope)
+## 🛡️ Architectural Principles & Non-Goals
 
-To guarantee a working, highly polished product within a 6-hour hackathon timeframe, the following are strictly excluded:
+ActionLens is deliberately built to be lightweight, stateless, and privacy-respecting. To avoid bloat and ensure zero maintenance overhead, the following design decisions were intentionally made:
 
 ```text
-❌ Authentication / Login screens
-❌ User accounts & profiles
-❌ Database persistence (PostgreSQL / MongoDB)
-❌ PDF history or session storage
-❌ Cloud bucket storage (S3 / GCS)
-❌ WhatsApp / SMS / Email integrations
-❌ Calendar API integrations
-❌ Heavy OCR infrastructure (Tesseract / EasyOCR)
-❌ Self-hosted MinerU instance
-❌ Self-hosted local Gemma weights / vLLM
-❌ Vector databases & RAG pipelines
-❌ Admin / analytics dashboards
+• No Authentication Walls       → Instant access with zero sign-up friction
+• No Database Overhead          → Completely stateless; your documents remain private
+• No File Retention             → In-memory processing; documents are never saved
+• No Heavy Local OCR Daemons    → High-accuracy layout parsing handled via API
+• No Complex Vector Databases   → Gemma reasons directly over the structured document
+• No Cloud Storage Dependencies  → Pure serverless runtime with zero cold storage costs
 ```
 
-> **Why?** Every item above is a hackathon time sink. By eliminating persistence and hosting overhead, the entire app runs serverlessly on Vercel with instant deployments.
+> **Why Stateless?** Eliminating persistence guarantees user document privacy, near-instant response times, and the ability to run anywhere with zero database provisioning.
 
 ---
 
@@ -274,7 +268,7 @@ ActionLens is designed to deploy with zero extra configuration on Vercel:
 
 ## 🤝 Contributing
 
-We welcome contributions during Hacktoberfest and beyond!
+We welcome contributions from the open-source community!
 
 1. Fork the repo and create your feature branch: `git checkout -b feature/cool-feature`
 2. Commit your changes: `git commit -m 'feat: add cool feature'`
