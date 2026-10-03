@@ -14,33 +14,33 @@ export default function WarningsView({
     switch (sev) {
       case 'critical':
         return {
-          card: 'border-rose-500/30 bg-rose-950/15',
-          icon: <AlertOctagon className="h-4 w-4 text-rose-400 shrink-0" />,
-          badge: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+          card: 'border-rose-200 bg-rose-50/60',
+          icon: <AlertOctagon className="h-4 w-4 text-rose-600 shrink-0" />,
+          badge: 'bg-rose-100 text-rose-800 border-rose-200',
         };
       case 'warning':
         return {
-          card: 'border-amber-500/30 bg-amber-950/15',
-          icon: <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />,
-          badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+          card: 'border-amber-200 bg-amber-50/60',
+          icon: <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />,
+          badge: 'bg-amber-100 text-amber-800 border-amber-200',
         };
       default:
         return {
-          card: 'border-blue-500/30 bg-blue-950/15',
-          icon: <Info className="h-4 w-4 text-blue-400 shrink-0" />,
-          badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+          card: 'border-blue-200 bg-blue-50/60',
+          icon: <Info className="h-4 w-4 text-blue-600 shrink-0" />,
+          badge: 'bg-blue-100 text-blue-800 border-blue-200',
         };
     }
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-5 backdrop-blur-sm">
-      <div className="border-b border-white/5 pb-3 mb-4">
-        <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
-          <AlertOctagon className="h-4 w-4 text-rose-400" />
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="border-b border-slate-100 pb-3 mb-4">
+        <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
+          <AlertOctagon className="h-4 w-4 text-rose-600" />
           <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
+        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
       </div>
 
       <div className="space-y-3">
@@ -55,13 +55,13 @@ export default function WarningsView({
                 <div className="mt-0.5">{style.icon}</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-xs font-semibold text-slate-100">{w.title}</h4>
+                    <h4 className="text-xs font-semibold text-slate-900">{w.title}</h4>
                     <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${style.badge}`}>
                       {w.severity}
                     </span>
                   </div>
                   {w.consequence && (
-                    <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                    <p className="text-[11px] text-slate-700 mt-1 leading-relaxed">
                       {w.consequence}
                     </p>
                   )}

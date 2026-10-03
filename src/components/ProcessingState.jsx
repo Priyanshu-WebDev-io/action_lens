@@ -3,20 +3,20 @@ import { Loader2, CheckCircle2, FileText, Cpu, ShieldCheck } from 'lucide-react'
 
 export default function ProcessingState({ step = 2 }) {
   const steps = [
-    { title: 'Document Ingestion', desc: 'Parsing PDF bytes and metadata', icon: FileText },
-    { title: 'MinerU Markdown Conversion', desc: 'Preserving layout, headers & tables', icon: Loader2 },
+    { title: 'Document Ingestion', desc: 'Parsing PDF bytes and layout', icon: FileText },
+    { title: 'MinerU Markdown Conversion', desc: 'Preserving structure, headers & tables', icon: Loader2 },
     { title: 'Gemma 4 Reasoning Core', desc: 'Extracting actions, rules & dependencies', icon: Cpu },
     { title: 'Zod Schema Validation', desc: 'Verifying structured data integrity', icon: ShieldCheck },
   ];
 
   return (
-    <div className="w-full max-w-xl mx-auto rounded-2xl border border-white/10 bg-slate-900/60 p-8 shadow-2xl backdrop-blur-xl">
+    <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
       <div className="text-center mb-6">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-400 mb-3 border border-sky-500/20 animate-pulse">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 mb-3 border border-sky-200 animate-pulse">
           <Cpu className="h-6 w-6" />
         </div>
-        <h3 className="text-lg font-bold text-white">Synthesizing Action Plan</h3>
-        <p className="text-xs text-slate-400">Google Gemma 4 is parsing rules, prerequisites, and deadlines...</p>
+        <h3 className="text-lg font-bold text-slate-900">Synthesizing Action Plan</h3>
+        <p className="text-xs text-slate-500">Google Gemma 4 is parsing rules, prerequisites, and deadlines...</p>
       </div>
 
       <div className="space-y-3">
@@ -30,19 +30,19 @@ export default function ProcessingState({ step = 2 }) {
               key={s.title}
               className={`flex items-center gap-3.5 rounded-xl border p-3 transition-all ${
                 isCurrent
-                  ? 'border-sky-500/40 bg-sky-500/5 shadow-md shadow-sky-500/10'
+                  ? 'border-sky-300 bg-sky-50/60 shadow-sm'
                   : isDone
-                  ? 'border-white/5 bg-white/[0.02] text-slate-400'
-                  : 'border-transparent text-slate-600 opacity-60'
+                  ? 'border-slate-200 bg-slate-50 text-slate-700'
+                  : 'border-transparent text-slate-400 opacity-50'
               }`}
             >
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                   isDone
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                     : isCurrent
-                    ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
-                    : 'bg-white/5 text-slate-500'
+                    ? 'bg-sky-100 text-sky-700 border border-sky-200'
+                    : 'bg-slate-100 text-slate-400'
                 }`}
               >
                 {isDone ? (
@@ -56,17 +56,17 @@ export default function ProcessingState({ step = 2 }) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-semibold ${isCurrent ? 'text-white' : isDone ? 'text-slate-300' : 'text-slate-500'}`}>
+                  <span className={`text-xs font-semibold ${isCurrent ? 'text-slate-900' : isDone ? 'text-slate-800' : 'text-slate-400'}`}>
                     {s.title}
                   </span>
                   {isCurrent && (
-                    <span className="text-[10px] text-sky-400 font-mono animate-pulse">Active</span>
+                    <span className="text-[10px] text-sky-700 font-mono font-medium animate-pulse">Active</span>
                   )}
                   {isDone && (
-                    <span className="text-[10px] text-emerald-400 font-mono">Done</span>
+                    <span className="text-[10px] text-emerald-600 font-mono font-medium">Done</span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-400 truncate">{s.desc}</p>
+                <p className="text-[11px] text-slate-500 truncate">{s.desc}</p>
               </div>
             </div>
           );

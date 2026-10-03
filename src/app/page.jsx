@@ -142,7 +142,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans">
       <Navbar
         onReset={handleReset}
         hasDocument={!!plan}
@@ -151,11 +151,11 @@ export default function Home() {
 
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {errorMessage && (
-          <div className="mb-6 rounded-xl border border-rose-500/30 bg-rose-950/20 p-4 text-xs text-rose-300 flex items-center justify-between">
+          <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 flex items-center justify-between">
             <span>{errorMessage}</span>
             <button
               onClick={() => setErrorMessage('')}
-              className="text-rose-400 hover:text-rose-200 font-bold"
+              className="text-rose-500 hover:text-rose-800 font-bold"
             >
               ✕
             </button>
@@ -274,7 +274,7 @@ export default function Home() {
 
                   {/* Below Cards: Dedicated Document Chat for Custom Inquiries */}
                   {rawText && (
-                    <div className="mt-8 pt-4 border-t border-white/5">
+                    <div className="mt-8 pt-4 border-t border-slate-200">
                       <DocumentChat
                         documentText={rawText}
                         suggestedQuestions={plan.suggestedQuestions}
@@ -289,7 +289,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-6 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500">
         <p>
           ActionLens • Powered by Google Gemma 4 & MinerU • Designed for clarity and decisive action.
         </p>

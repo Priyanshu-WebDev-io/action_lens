@@ -79,20 +79,20 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-5 backdrop-blur-sm flex flex-col h-[520px]">
-      <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3 shrink-0">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col h-[520px]">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3 shrink-0">
         <div>
-          <h2 className="text-sm font-bold tracking-tight text-white uppercase flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-sky-400" />
+          <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-sky-600" />
             <span>Ask The Document</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">Instant grounded answers verified by Google Gemma</p>
+          <p className="text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google Gemma</p>
         </div>
 
         {messages.length > 1 && (
           <button
             onClick={handleClear}
-            className="flex items-center gap-1 rounded bg-white/5 px-2 py-1 text-[11px] text-slate-400 hover:text-white hover:bg-white/10 transition"
+            className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition"
             title="Reset conversation"
           >
             <RotateCcw className="h-3 w-3" />
@@ -104,8 +104,8 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
       {/* Suggested Questions */}
       {suggestedQuestions.length > 0 && (
         <div className="mb-3 shrink-0">
-          <div className="flex items-center gap-1 text-[11px] text-slate-400 mb-1.5 font-medium">
-            <Sparkles className="h-3 w-3 text-sky-400" />
+          <div className="flex items-center gap-1 text-[11px] text-slate-500 mb-1.5 font-medium">
+            <Sparkles className="h-3 w-3 text-sky-600" />
             <span>Suggested queries:</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -114,7 +114,7 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
                 key={i}
                 onClick={() => handleSend(q)}
                 disabled={isAsking}
-                className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 hover:border-sky-500/40 hover:bg-sky-500/10 hover:text-sky-300 transition text-left"
+                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 transition text-left"
               >
                 {q}
               </button>
@@ -131,7 +131,7 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
             className={`flex items-start gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {m.role === 'assistant' && (
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 border border-sky-200">
                 <Bot className="h-4 w-4" />
               </div>
             )}
@@ -140,8 +140,8 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
               <div
                 className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-wrap ${
                   m.role === 'user'
-                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/10'
-                    : 'bg-slate-900 border border-white/10 text-slate-200'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'bg-slate-50 border border-slate-200 text-slate-800'
                 }`}
               >
                 {m.content}
@@ -150,16 +150,16 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
               {m.role === 'assistant' && idx > 0 && (
                 <button
                   onClick={() => handleCopy(m.content, idx)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition p-1 rounded bg-slate-800 text-slate-400 hover:text-white"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition p-1 rounded bg-white shadow-sm border border-slate-200 text-slate-500 hover:text-slate-800"
                   title="Copy answer"
                 >
-                  {copiedIdx === idx ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                  {copiedIdx === idx ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
                 </button>
               )}
             </div>
 
             {m.role === 'user' && (
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-slate-300 border border-white/10">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
                 <User className="h-4 w-4" />
               </div>
             )}
@@ -168,11 +168,11 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
 
         {isAsking && (
           <div className="flex items-start gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 border border-sky-200">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="rounded-xl border border-white/10 bg-slate-900 px-3.5 py-2.5 text-xs text-slate-400 flex items-center gap-2">
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-400" />
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-600 flex items-center gap-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
               <span>Gemma is reasoning over document facts...</span>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
           e.preventDefault();
           handleSend();
         }}
-        className="mt-3 pt-3 border-t border-white/5 flex items-center gap-2 shrink-0"
+        className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 shrink-0"
       >
         <input
           type="text"
@@ -194,12 +194,12 @@ export default function DocumentChat({ documentText, suggestedQuestions = [] }) 
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask anything about this document..."
           disabled={isAsking}
-          className="flex-1 rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
         />
         <button
           type="submit"
           disabled={!input.trim() || isAsking}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500 text-white shadow-lg shadow-sky-500/20 hover:bg-sky-400 disabled:opacity-50 transition shrink-0"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-600 text-white shadow-md shadow-sky-600/20 hover:bg-sky-700 disabled:opacity-50 transition shrink-0"
         >
           <Send className="h-3.5 w-3.5" />
         </button>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Download, Copy, Check, Printer, FileText, Calendar, AlertOctagon, CheckCircle2 } from 'lucide-react';
+import { Download, Copy, Check, Printer, CheckCircle2 } from 'lucide-react';
 
 export default function PlanHeader({ plan, onReset }) {
   const [copied, setCopied] = useState(false);
@@ -19,31 +19,50 @@ export default function PlanHeader({ plan, onReset }) {
     md += `> **Type:** ${plan.documentType || 'Official Notice'}\n`;
     md += `> **Summary:** ${plan.summary}\n\n`;
 
-    md += `## 📋 Action Checklist\n`;
-    plan.actions?.forEach((act) => {
-      md += `- [ ] **${act.title}** (${act.priority.toUpperCase()})\n`;
-      if (act.description) md += `  - ${act.description}\n`;
-    });
+    if (plan.tags?.length > 0) {
+      md += `**Tags:** ${plan.tags.map((t) => `#${t}`).join(' ')}\n\n`;
+    }
 
-    md += `\n## 📅 Deadlines & Cutoffs\n`;
-    plan.deadlines?.forEach((dl) => {
-      md += `- **${dl.title}:** ${dl.date} ${dl.time || ''} ${dl.notes ? `(${dl.notes})` : ''}\n`;
-    });
+    if (plan.actions?.length > 0) {
+      md += `## 📋 ${plan.sectionHeadings?.actions?.title || 'Action Checklist'}\n`;
+      plan.actions.forEach((act) => {
+        md += `- [ ] **${act.title}** (${act.priority.toUpperCase()})\n`;
+        if (act.description) md += `  - ${act.description}\n`;
+      });
+      md += `\n`;
+    }
 
-    md += `\n## 📎 Required Documents\n`;
-    plan.requirements?.forEach((req) => {
-      md += `- **${req.name}** [${req.format || 'Standard'}]: ${req.details || ''}\n`;
-    });
+    if (plan.deadlines?.length > 0) {
+      md += `## 📅 ${plan.sectionHeadings?.deadlines?.title || 'Deadlines & Cutoffs'}\n`;
+      plan.deadlines.forEach((dl) => {
+        md += `- **${dl.title}:** ${dl.date} ${dl.time || ''} ${dl.notes ? `(${dl.notes})` : ''}\n`;
+      });
+      md += `\n`;
+    }
 
-    md += `\n## 🔗 Dependencies & Sequential Order\n`;
-    plan.dependencies?.forEach((dep) => {
-      md += `Step ${dep.stepNumber}: **${dep.title}** ${dep.prerequisiteFor ? `(Required for: ${dep.prerequisiteFor})` : ''}\n`;
-    });
+    if (plan.requirements?.length > 0) {
+      md += `## 📎 ${plan.sectionHeadings?.requirements?.title || 'Required Documents'}\n`;
+      plan.requirements.forEach((req) => {
+        md += `- **${req.name}** [${req.format || 'Standard'}]: ${req.details || ''}\n`;
+      });
+      md += `\n`;
+    }
 
-    md += `\n## ⚠️ Warnings & Penalties\n`;
-    plan.warnings?.forEach((warn) => {
-      md += `- ⚠️ **${warn.title}:** ${warn.consequence || ''}\n`;
-    });
+    if (plan.dependencies?.length > 0) {
+      md += `## 🔗 ${plan.sectionHeadings?.dependencies?.title || 'Sequential Order'}\n`;
+      plan.dependencies.forEach((dep) => {
+        md += `Step ${dep.stepNumber}: **${dep.title}** ${dep.prerequisiteFor ? `(Required for: ${dep.prerequisiteFor})` : ''}\n`;
+      });
+      md += `\n`;
+    }
+
+    if (plan.warnings?.length > 0) {
+      md += `## ⚠️ ${plan.sectionHeadings?.warnings?.title || 'Warnings & Advisories'}\n`;
+      plan.warnings.forEach((warn) => {
+        md += `- ⚠️ **${warn.title}:** ${warn.consequence || ''}\n`;
+      });
+      md += `\n`;
+    }
 
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -55,33 +74,33 @@ export default function PlanHeader({ plan, onReset }) {
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-xl shadow-xl mb-6">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mb-6">
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         {/* Title & Summary */}
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="rounded-md bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-400 border border-sky-500/20">
+            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700 border border-sky-200">
               {plan.documentType || 'Analyzed Document'}
             </span>
-            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200 flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
               <span>Gemma Verified</span>
             </span>
             {plan.tags?.map((tag, idx) => (
               <span
                 key={idx}
-                className="rounded-md bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-300 border border-white/10"
+                className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700 border border-slate-200"
               >
                 #{tag}
               </span>
             ))}
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-2">
             {plan.documentTitle}
           </h1>
 
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-3xl">
             {plan.summary}
           </p>
         </div>
@@ -90,26 +109,26 @@ export default function PlanHeader({ plan, onReset }) {
         <div className="flex items-center gap-2 shrink-0 self-start">
           <button
             onClick={handleDownloadMarkdown}
-            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white transition shadow-sm"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm"
             title="Download formatted Markdown action plan"
           >
-            <Download className="h-3.5 w-3.5 text-sky-400" />
+            <Download className="h-3.5 w-3.5 text-sky-600" />
             <span>Export MD</span>
           </button>
 
           <button
             onClick={handleCopyJson}
-            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white transition shadow-sm"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm"
             title="Copy structured JSON"
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied</span>
+                <Check className="h-3.5 w-3.5 text-emerald-600" />
+                <span className="text-emerald-700 font-semibold">Copied</span>
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5 text-slate-400" />
+                <Copy className="h-3.5 w-3.5 text-slate-500" />
                 <span>JSON</span>
               </>
             )}
@@ -117,10 +136,10 @@ export default function PlanHeader({ plan, onReset }) {
 
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white transition shadow-sm hidden sm:flex"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm hidden sm:flex"
             title="Print action plan"
           >
-            <Printer className="h-3.5 w-3.5 text-slate-400" />
+            <Printer className="h-3.5 w-3.5 text-slate-500" />
             <span>Print</span>
           </button>
         </div>
@@ -130,34 +149,34 @@ export default function PlanHeader({ plan, onReset }) {
       {(() => {
         const metrics = [
           plan.actions?.length > 0 && {
-            label: 'Action Tasks',
+            label: plan.sectionHeadings?.actions?.title || 'Action Tasks',
             value: plan.actions.length,
-            color: 'text-white',
+            color: 'text-slate-900',
           },
           plan.deadlines?.length > 0 && {
-            label: 'Key Deadlines',
+            label: plan.sectionHeadings?.deadlines?.title || 'Key Deadlines',
             value: plan.deadlines.length,
-            color: 'text-sky-400',
+            color: 'text-sky-700',
           },
           plan.requirements?.length > 0 && {
-            label: 'Required Proofs',
+            label: plan.sectionHeadings?.requirements?.title || 'Required Proofs',
             value: plan.requirements.length,
-            color: 'text-amber-400',
+            color: 'text-amber-700',
           },
           plan.warnings?.length > 0 && {
-            label: 'Risk Callouts',
+            label: plan.sectionHeadings?.warnings?.title || 'Risk Callouts',
             value: plan.warnings.length,
-            color: 'text-rose-400',
+            color: 'text-rose-700',
           },
         ].filter(Boolean);
 
         if (metrics.length === 0) return null;
 
         return (
-          <div className="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-white/5">
+          <div className="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-slate-200">
             {metrics.map((m) => (
-              <div key={m.label} className="min-w-[130px] flex-1 rounded-xl border border-white/5 bg-white/[0.02] p-3">
-                <div className="text-[11px] text-slate-400 font-medium">{m.label}</div>
+              <div key={m.label} className="min-w-[130px] flex-1 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="text-[11px] text-slate-500 font-medium truncate">{m.label}</div>
                 <div className={`text-lg font-bold mt-0.5 ${m.color}`}>{m.value}</div>
               </div>
             ))}
