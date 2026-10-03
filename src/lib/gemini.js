@@ -51,7 +51,7 @@ export async function parsePdfToMarkdown(buffer, filename = 'document.pdf') {
  */
 export async function generateActionPlanFromText(documentText, documentName = 'Uploaded Notice') {
   const apiKey = process.env.GEMINI_API_KEY;
-  const modelName = process.env.GEMMA_MODEL_NAME || 'gemini-2.5-flash';
+  const modelName = process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash';
 
   // If no API key is configured, check if this matches any sample or run heuristic extraction
   if (!apiKey) {
@@ -162,7 +162,7 @@ Output pure JSON only, without any markdown backticks or commentary.`;
  */
 export async function askDocumentQuestion(documentText, question, conversationHistory = []) {
   const apiKey = process.env.GEMINI_API_KEY;
-  const modelName = process.env.GEMMA_MODEL_NAME || 'gemini-2.5-flash';
+  const modelName = process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash';
 
   if (!apiKey) {
     // Intelligent heuristic answer for demo mode
