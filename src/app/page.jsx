@@ -30,9 +30,9 @@ export default function Home() {
     setProcessingDocName(file.name || 'Uploaded PDF Notice');
     setProcessingStep(0);
 
-    const timer1 = setTimeout(() => setProcessingStep(1), 600);
-    const timer2 = setTimeout(() => setProcessingStep(2), 1500);
-    const timer3 = setTimeout(() => setProcessingStep(3), 3400);
+    const timer1 = setTimeout(() => setProcessingStep(1), 1200);
+    const timer2 = setTimeout(() => setProcessingStep(2), 3500);
+    const timer3 = setTimeout(() => setProcessingStep(3), 6800);
 
     try {
       const formData = new FormData();
@@ -47,10 +47,21 @@ export default function Home() {
       clearTimeout(timer2);
       clearTimeout(timer3);
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error(`Server returned status ${res.status}. Please check document format and try again.`);
+      }
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to process document');
       }
+
+      // Mark final tier (Step 4) as complete!
+      setProcessingStep(4);
+      // Brief delay so user visually sees the 100% completion & green checkmark
+      await new Promise((resolve) => setTimeout(resolve, 450));
 
       setPlan(data.plan);
       setRawText(data.rawText || '');
@@ -72,8 +83,8 @@ export default function Home() {
     setProcessingDocName('Pasted Circular Notice');
     setProcessingStep(1);
 
-    const timer1 = setTimeout(() => setProcessingStep(2), 800);
-    const timer2 = setTimeout(() => setProcessingStep(3), 2200);
+    const timer1 = setTimeout(() => setProcessingStep(2), 1500);
+    const timer2 = setTimeout(() => setProcessingStep(3), 3500);
 
     try {
       const res = await fetch('/api/process', {
@@ -85,10 +96,19 @@ export default function Home() {
       clearTimeout(timer1);
       clearTimeout(timer2);
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error(`Server error (${res.status}). Please try again.`);
+      }
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to process text');
       }
+
+      setProcessingStep(4);
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       setPlan(data.plan);
       setRawText(data.rawText || text);
@@ -107,12 +127,12 @@ export default function Home() {
     setIsLoading(true);
     setErrorMessage('');
     const sample = SAMPLE_DOCUMENTS.find((d) => d.id === demoId);
-    setProcessingDocName(sample ? sample.name : 'Sample Notice');
+    setProcessingDocName(sample ? sample.name || sample.title : 'Sample Notice');
     setProcessingStep(0);
 
     const timer1 = setTimeout(() => setProcessingStep(1), 350);
-    const timer2 = setTimeout(() => setProcessingStep(2), 800);
-    const timer3 = setTimeout(() => setProcessingStep(3), 1400);
+    const timer2 = setTimeout(() => setProcessingStep(2), 750);
+    const timer3 = setTimeout(() => setProcessingStep(3), 1200);
 
     try {
       const res = await fetch('/api/process', {
@@ -125,10 +145,19 @@ export default function Home() {
       clearTimeout(timer2);
       clearTimeout(timer3);
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error('Failed to load sample circular response.');
+      }
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to load demo document');
       }
+
+      setProcessingStep(4);
+      await new Promise((resolve) => setTimeout(resolve, 350));
 
       setPlan(data.plan);
       setRawText(data.rawText || '');
