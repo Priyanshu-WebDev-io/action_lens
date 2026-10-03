@@ -81,20 +81,20 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col h-[520px]">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3 shrink-0">
+    <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-sm flex flex-col h-[480px] sm:h-[520px]">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 sm:pb-3 mb-2.5 sm:mb-3 shrink-0">
         <div>
-          <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-sky-600" />
+          <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-1.5 sm:gap-2">
+            <MessageSquare className="h-4 w-4 text-sky-600 shrink-0" />
             <span>Ask The Document</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google Gemma</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google Gemma</p>
         </div>
 
         {messages.length > 1 && (
           <button
             onClick={handleClear}
-            className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition"
+            className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-[10px] sm:text-[11px] text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition"
             title="Reset conversation"
           >
             <RotateCcw className="h-3 w-3" />
@@ -105,9 +105,9 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
 
       {/* Suggested Questions */}
       {suggestedQuestions.length > 0 && (
-        <div className="mb-3 shrink-0">
-          <div className="flex items-center gap-1 text-[11px] text-slate-500 mb-1.5 font-medium">
-            <Sparkles className="h-3 w-3 text-sky-600" />
+        <div className="mb-2.5 sm:mb-3 shrink-0">
+          <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 mb-1.5 font-medium">
+            <Sparkles className="h-3 w-3 text-sky-600 shrink-0" />
             <span>Suggested queries:</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -116,7 +116,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
                 key={i}
                 onClick={() => handleSend(q)}
                 disabled={isAsking}
-                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 transition text-left"
+                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] sm:text-[11px] text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 transition text-left"
               >
                 {q}
               </button>
@@ -126,21 +126,21 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
       )}
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+      <div className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-3 pr-1">
         {messages.map((m, idx) => (
           <div
             key={idx}
-            className={`flex items-start gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex items-start gap-2 sm:gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {m.role === 'assistant' && (
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 border border-sky-200">
-                <Bot className="h-4 w-4" />
+              <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 border border-sky-200">
+                <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
             )}
 
-            <div className="relative group max-w-[85%]">
+            <div className="relative group max-w-[90%] sm:max-w-[85%]">
               <div
-                className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed ${
+                className={`rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs leading-relaxed ${
                   m.role === 'user'
                     ? 'bg-sky-600 text-white shadow-sm whitespace-pre-wrap'
                     : 'bg-slate-50 border border-slate-200 text-slate-800'
@@ -188,7 +188,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
           e.preventDefault();
           handleSend();
         }}
-        className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 shrink-0"
+        className="mt-2.5 sm:mt-3 pt-2.5 sm:pt-3 border-t border-slate-100 flex items-center gap-2 shrink-0"
       >
         <input
           type="text"
@@ -196,12 +196,12 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask anything about this document..."
           disabled={isAsking}
-          className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
+          className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3 sm:px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
         />
         <button
           type="submit"
           disabled={!input.trim() || isAsking}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-600 text-white shadow-md shadow-sky-600/20 hover:bg-sky-700 disabled:opacity-50 transition shrink-0"
+          className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-sky-600 text-white shadow-md shadow-sky-600/20 hover:bg-sky-700 disabled:opacity-50 transition shrink-0"
         >
           <Send className="h-3.5 w-3.5" />
         </button>

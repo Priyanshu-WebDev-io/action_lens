@@ -40,44 +40,44 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-0">
       {/* Hero Headline */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-2 sm:mb-3">
           Documents tell you everything. <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
             ActionLens tells you what to do.
           </span>
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
+        <p className="text-xs sm:text-base text-slate-600 max-w-2xl mx-auto px-2">
           Upload any circular, notice, or official policy. ActionLens extracts checklists, deadlines, dependencies, and rules in seconds.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-center gap-2 mb-6">
+      <div className="flex items-center justify-center gap-2 mb-5 sm:mb-6 max-w-md mx-auto">
         <button
           onClick={() => setActiveTab('upload')}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition ${
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs font-semibold transition ${
             activeTab === 'upload'
               ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
               : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
           }`}
         >
-          <UploadCloud className="h-4 w-4" />
+          <UploadCloud className="h-4 w-4 shrink-0" />
           <span>Upload PDF Notice</span>
         </button>
 
         <button
           onClick={() => setActiveTab('text')}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition ${
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs font-semibold transition ${
             activeTab === 'text'
               ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
               : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
           }`}
         >
-          <Clipboard className="h-4 w-4" />
-          <span>Paste Notice Text</span>
+          <Clipboard className="h-4 w-4 shrink-0" />
+          <span>Paste Text</span>
         </button>
       </div>
 
@@ -88,7 +88,7 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 text-center transition-all shadow-sm ${
+          className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 sm:p-10 text-center transition-all shadow-sm ${
             isDragging
               ? 'border-sky-500 bg-sky-50/60 shadow-lg shadow-sky-500/10'
               : 'border-slate-300 bg-white hover:border-sky-500 hover:bg-slate-50/60'
@@ -102,14 +102,14 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
             onChange={(e) => e.target.files?.[0] && handleFileSelected(e.target.files[0])}
           />
 
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200 text-sky-600 transition-transform group-hover:scale-110 shadow-sm">
-            <UploadCloud className="h-8 w-8" />
+          <div className="mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200 text-sky-600 transition-transform group-hover:scale-110 shadow-sm">
+            <UploadCloud className="h-6 w-6 sm:h-8 sm:w-8" />
           </div>
 
-          <h3 className="text-base font-semibold text-slate-900 mb-1">
+          <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-1 px-2">
             {selectedFile ? selectedFile.name : 'Drop your PDF circular here, or browse'}
           </h3>
-          <p className="text-xs text-slate-500 max-w-sm mb-4">
+          <p className="text-[11px] sm:text-xs text-slate-500 max-w-sm mb-4 px-2">
             Supports university notices, office circulars, policy memos, and guidelines (up to 15MB).
           </p>
 
@@ -120,7 +120,7 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
         </div>
       ) : (
         /* Tab 2: Text Paste Card */
-        <form onSubmit={handleTextSubmit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form onSubmit={handleTextSubmit} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
           <label className="block text-xs font-semibold text-slate-700 mb-2">
             Paste Notice / Circular Text:
           </label>
@@ -129,13 +129,13 @@ export default function UploadZone({ onProcessFile, onProcessText, isLoading }) 
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
             placeholder="Paste raw notice text (e.g. Notice on Holiday Observance / Exam form submission...)"
-            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-xs font-mono text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 sm:p-4 text-xs font-mono text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
           <div className="mt-4 flex justify-end">
             <button
               type="submit"
               disabled={!pastedText.trim() || isLoading}
-              className="flex items-center gap-2 rounded-lg bg-sky-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-sky-600/20 hover:bg-sky-700 disabled:opacity-50 transition"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-5 py-2.5 sm:py-2 text-xs font-semibold text-white shadow-md shadow-sky-600/20 hover:bg-sky-700 disabled:opacity-50 transition"
             >
               <span>Generate Action Plan</span>
               <ArrowRight className="h-3.5 w-3.5" />

@@ -10,16 +10,16 @@ export default function ProcessingState({ step = 2 }) {
   ];
 
   return (
-    <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="text-center mb-6">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 mb-3 border border-sky-200 animate-pulse">
-          <Cpu className="h-6 w-6" />
+    <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-200 bg-white p-5 sm:p-8 shadow-sm">
+      <div className="text-center mb-5 sm:mb-6">
+        <div className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 mb-2.5 sm:mb-3 border border-sky-200 animate-pulse">
+          <Cpu className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
-        <h3 className="text-lg font-bold text-slate-900">Synthesizing Action Plan</h3>
-        <p className="text-xs text-slate-500">Google Gemma 4 is parsing rules, prerequisites, and deadlines...</p>
+        <h3 className="text-base sm:text-lg font-bold text-slate-900">Synthesizing Action Plan</h3>
+        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 px-2">Google Gemma 4 is parsing rules, prerequisites, and deadlines...</p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5 sm:space-y-3">
         {steps.map((s, idx) => {
           const isDone = idx < step;
           const isCurrent = idx === step;
@@ -28,7 +28,7 @@ export default function ProcessingState({ step = 2 }) {
           return (
             <div
               key={s.title}
-              className={`flex items-center gap-3.5 rounded-xl border p-3 transition-all ${
+              className={`flex items-center gap-2.5 sm:gap-3.5 rounded-xl border p-2.5 sm:p-3 transition-all ${
                 isCurrent
                   ? 'border-sky-300 bg-sky-50/60 shadow-sm'
                   : isDone

@@ -13,26 +13,26 @@ export default function DependencyFlow({
   const sortedDeps = [...dependencies].sort((a, b) => a.stepNumber - b.stepNumber);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="border-b border-slate-100 pb-3 mb-4">
-        <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
-          <GitMerge className="h-4 w-4 text-sky-600" />
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+      <div className="border-b border-slate-100 pb-2.5 sm:pb-3 mb-3 sm:mb-4">
+        <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
+          <GitMerge className="h-4 w-4 text-sky-600 shrink-0" />
           <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">{subtitle}</p>
       </div>
 
-      <div className="relative space-y-3">
+      <div className="relative space-y-2.5 sm:space-y-3">
         {sortedDeps.map((dep, index) => (
-          <div key={dep.id || index} className="relative flex items-start gap-3.5">
+          <div key={dep.id || index} className="relative flex items-start gap-2.5 sm:gap-3.5">
             {/* Step Badge */}
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-700 border border-sky-200 text-xs font-bold font-mono">
+            <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-700 border border-sky-200 text-[11px] sm:text-xs font-bold font-mono">
               {dep.stepNumber || index + 1}
             </div>
 
             {/* Step Card */}
-            <div className="flex-1 rounded-xl border border-slate-200 bg-slate-50/70 p-3 hover:bg-slate-100/60 transition">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+            <div className="flex-1 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 sm:p-3 hover:bg-slate-100/60 transition">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-1.5">
                 <h4 className="text-xs font-semibold text-slate-900">{dep.title}</h4>
                 
                 {dep.prerequisiteFor && (

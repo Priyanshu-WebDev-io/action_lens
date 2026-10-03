@@ -11,20 +11,20 @@ export default function RequirementsView({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="border-b border-slate-100 pb-3 mb-4">
-        <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
-          <Paperclip className="h-4 w-4 text-sky-600" />
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+      <div className="border-b border-slate-100 pb-2.5 sm:pb-3 mb-3 sm:mb-4">
+        <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
+          <Paperclip className="h-4 w-4 text-sky-600 shrink-0" />
           <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">{subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
         {requirements.map((req) => (
           <div
             key={req.id}
-            className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 hover:bg-slate-100/60 transition"
+            className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:p-3.5 hover:bg-slate-100/60 transition"
           >
             <div className="flex items-start justify-between gap-2 mb-1.5">
               <span className="text-xs font-semibold text-slate-900">{req.name}</span>

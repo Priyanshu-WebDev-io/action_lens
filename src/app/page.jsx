@@ -149,13 +149,13 @@ export default function Home() {
         documentTitle={plan?.documentTitle || ''}
       />
 
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         {errorMessage && (
-          <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 flex items-center justify-between">
+          <div className="mb-4 sm:mb-6 rounded-xl border border-rose-200 bg-rose-50 p-3.5 sm:p-4 text-xs text-rose-700 flex items-center justify-between">
             <span>{errorMessage}</span>
             <button
               onClick={() => setErrorMessage('')}
-              className="text-rose-500 hover:text-rose-800 font-bold"
+              className="text-rose-500 hover:text-rose-800 font-bold ml-2"
             >
               ✕
             </button>
@@ -163,11 +163,11 @@ export default function Home() {
         )}
 
         {isLoading ? (
-          <div className="py-16">
+          <div className="py-10 sm:py-16">
             <ProcessingState step={processingStep} />
           </div>
         ) : !plan ? (
-          <div className="py-6 sm:py-12">
+          <div className="py-4 sm:py-12">
             <UploadZone
               onProcessFile={handleProcessFile}
               onProcessText={handleProcessText}
@@ -176,7 +176,7 @@ export default function Home() {
             />
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <PlanHeader plan={plan} onReset={handleReset} />
 
             {/* Dynamic Results Grid */}
@@ -194,10 +194,10 @@ export default function Home() {
               const headings = plan.sectionHeadings || {};
 
               return (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                     {/* Primary Column */}
-                    <div className={hasRight ? 'lg:col-span-7 space-y-6' : 'lg:col-span-12 space-y-6'}>
+                    <div className={hasRight ? 'lg:col-span-7 space-y-4 sm:space-y-6' : 'lg:col-span-12 space-y-4 sm:space-y-6'}>
                       {hasActions && (
                         <ActionChecklist
                           actions={plan.actions}
@@ -245,7 +245,7 @@ export default function Home() {
 
                     {/* Secondary Column */}
                     {hasRight && hasLeft && (
-                      <div className="lg:col-span-5 space-y-6">
+                      <div className="lg:col-span-5 space-y-4 sm:space-y-6">
                         {hasDeadlines && (
                           <DeadlinesView
                             deadlines={plan.deadlines}
@@ -274,7 +274,7 @@ export default function Home() {
 
                   {/* Below Cards: Dedicated Document Chat for Custom Inquiries */}
                   {(rawText || plan) && (
-                    <div className="mt-8 pt-4 border-t border-slate-200">
+                    <div className="mt-6 pt-4 sm:mt-8 border-t border-slate-200">
                       <DocumentChat
                         documentText={rawText}
                         plan={plan}

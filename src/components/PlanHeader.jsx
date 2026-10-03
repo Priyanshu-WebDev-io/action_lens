@@ -74,29 +74,29 @@ export default function PlanHeader({ plan, onReset }) {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mb-6">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm mb-4 sm:mb-6">
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         {/* Title & Summary */}
-        <div className="flex-1">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700 border border-sky-200">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-sky-700 border border-sky-200">
               {plan.documentType || 'Analyzed Document'}
             </span>
-            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200 flex items-center gap-1">
+            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-emerald-700 border border-emerald-200 flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
               <span>Gemma Verified</span>
             </span>
             {plan.tags?.map((tag, idx) => (
               <span
                 key={idx}
-                className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700 border border-slate-200"
+                className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-slate-700 border border-slate-200"
               >
                 #{tag}
               </span>
             ))}
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-2">
+          <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 mb-1.5 sm:mb-2">
             {plan.documentTitle}
           </h1>
 
@@ -106,10 +106,10 @@ export default function PlanHeader({ plan, onReset }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0 self-start">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 self-start">
           <button
             onClick={handleDownloadMarkdown}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-2.5 sm:px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm"
             title="Download formatted Markdown action plan"
           >
             <Download className="h-3.5 w-3.5 text-sky-600" />
@@ -118,7 +118,7 @@ export default function PlanHeader({ plan, onReset }) {
 
           <button
             onClick={handleCopyJson}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-2.5 sm:px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm"
             title="Copy structured JSON"
           >
             {copied ? (
@@ -136,7 +136,7 @@ export default function PlanHeader({ plan, onReset }) {
 
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm hidden sm:flex"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-2.5 sm:px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition shadow-sm hidden sm:flex"
             title="Print action plan"
           >
             <Printer className="h-3.5 w-3.5 text-slate-500" />
@@ -173,11 +173,11 @@ export default function PlanHeader({ plan, onReset }) {
         if (metrics.length === 0) return null;
 
         return (
-          <div className="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-slate-200">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-5 border-t border-slate-200">
             {metrics.map((m) => (
-              <div key={m.label} className="min-w-[130px] flex-1 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="text-[11px] text-slate-500 font-medium truncate">{m.label}</div>
-                <div className={`text-lg font-bold mt-0.5 ${m.color}`}>{m.value}</div>
+              <div key={m.label} className="sm:min-w-[130px] sm:flex-1 rounded-xl border border-slate-200 bg-slate-50 p-2.5 sm:p-3">
+                <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate">{m.label}</div>
+                <div className={`text-base sm:text-lg font-bold mt-0.5 ${m.color}`}>{m.value}</div>
               </div>
             ))}
           </div>

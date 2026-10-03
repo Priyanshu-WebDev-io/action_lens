@@ -16,36 +16,38 @@ function GitHubIcon({ className = 'h-4 w-4' }) {
 export default function Navbar({ onReset, hasDocument, documentTitle }) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 shadow-md shadow-sky-500/10">
-            <Sparkles className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 shadow-md shadow-sky-500/10">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold tracking-tight text-slate-900">ActionLens</span>
+              <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900">ActionLens</span>
             </div>
           </div>
         </div>
 
         {/* Current Document Pill (if loaded) */}
         {hasDocument && (
-          <div className="hidden md:flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3.5 py-1 text-xs text-slate-700">
-            <FileText className="h-3.5 w-3.5 text-sky-600" />
-            <span className="max-w-[220px] truncate font-medium text-slate-800">{documentTitle}</span>
+          <div className="hidden lg:flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3.5 py-1 text-xs text-slate-700">
+            <FileText className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+            <span className="max-w-[200px] truncate font-medium text-slate-800">{documentTitle}</span>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {hasDocument && (
             <button
               onClick={onReset}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200 hover:text-slate-900"
+              className="flex items-center gap-1 sm:gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1.5 sm:px-3 text-xs font-medium text-slate-700 transition hover:bg-slate-200 hover:text-slate-900"
+              title="Upload new notice"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>New Document</span>
+              <span className="hidden sm:inline">New Document</span>
+              <span className="sm:hidden">New</span>
             </button>
           )}
 
@@ -53,7 +55,8 @@ export default function Navbar({ onReset, hasDocument, documentTitle }) {
             href="https://github.com/Priyanshu-WebDev-io/hacktoberfest"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200 hover:text-slate-900"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1.5 sm:px-3 text-xs font-medium text-slate-700 transition hover:bg-slate-200 hover:text-slate-900"
+            title="View on GitHub"
           >
             <GitHubIcon className="h-3.5 w-3.5 text-slate-700" />
             <span className="hidden sm:inline">GitHub</span>

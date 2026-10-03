@@ -34,29 +34,29 @@ export default function WarningsView({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="border-b border-slate-100 pb-3 mb-4">
-        <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
-          <AlertOctagon className="h-4 w-4 text-rose-600" />
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+      <div className="border-b border-slate-100 pb-2.5 sm:pb-3 mb-3 sm:mb-4">
+        <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
+          <AlertOctagon className="h-4 w-4 text-rose-600 shrink-0" />
           <span>{title}</span>
         </h2>
-        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">{subtitle}</p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5 sm:space-y-3">
         {warnings.map((w, index) => {
           const style = getSeverityStyle(w.severity);
           return (
             <div
               key={w.id || index}
-              className={`rounded-xl border p-3.5 transition ${style.card}`}
+              className={`rounded-xl border p-3 sm:p-3.5 transition ${style.card}`}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2.5 sm:gap-3">
                 <div className="mt-0.5">{style.icon}</div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-2">
                     <h4 className="text-xs font-semibold text-slate-900">{w.title}</h4>
-                    <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${style.badge}`}>
+                    <span className={`self-start sm:self-auto rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${style.badge}`}>
                       {w.severity}
                     </span>
                   </div>

@@ -38,26 +38,26 @@ export default function ActionChecklist({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
       {/* Top Header & Progress */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-slate-100 pb-3 sm:pb-4 mb-3 sm:mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold tracking-tight text-slate-900 uppercase">{title}</h2>
-            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700 border border-sky-200">
+            <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 uppercase">{title}</h2>
+            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-sky-700 border border-sky-200">
               {completedCount}/{totalCount} Completed
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">{subtitle}</p>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 self-start sm:self-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 self-start sm:self-auto max-w-full">
           {['all', 'pending', 'high', 'completed'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition ${
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize shrink-0 transition ${
                 filter === f
                   ? 'bg-sky-600 text-white shadow-sm'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
@@ -70,7 +70,7 @@ export default function ActionChecklist({
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-slate-100 rounded-full h-1.5 mb-5 overflow-hidden">
+      <div className="w-full bg-slate-100 rounded-full h-1.5 mb-4 sm:mb-5 overflow-hidden">
         <div
           className="bg-gradient-to-r from-sky-500 to-blue-600 h-1.5 rounded-full transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
@@ -78,7 +78,7 @@ export default function ActionChecklist({
       </div>
 
       {/* Action Items List */}
-      <div className="space-y-2.5">
+      <div className="space-y-2 sm:space-y-2.5">
         {filteredActions.length === 0 ? (
           <p className="text-center py-6 text-xs text-slate-400">No action items in this filter.</p>
         ) : (
@@ -86,7 +86,7 @@ export default function ActionChecklist({
             <div
               key={action.id}
               onClick={() => onToggle(action.id)}
-              className={`group flex items-start gap-3.5 rounded-xl border p-3.5 cursor-pointer transition-all ${
+              className={`group flex items-start gap-2.5 sm:gap-3.5 rounded-xl border p-3 sm:p-3.5 cursor-pointer transition-all ${
                 action.isCompleted
                   ? 'border-slate-100 bg-slate-50/60 opacity-60'
                   : 'border-slate-200 bg-white hover:border-sky-400 hover:bg-slate-50/50 shadow-sm'
