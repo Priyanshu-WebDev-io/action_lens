@@ -112,49 +112,66 @@ ${documentText.slice(0, 15000)}
 
 Output pure JSON only, without any markdown backticks or commentary.`;
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: `${systemInstruction}\n\n${prompt}` }],
+  const candidateModels = Array.from(
+    new Set([
+      process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+    ])
+  );
+
+  let lastError = null;
+
+  for (const model of candidateModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: `${systemInstruction}\n\n${prompt}` }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: 'application/json',
           },
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          responseMimeType: 'application/json',
-        },
-      }),
-    });
+        }),
+      });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Google API returned ${response.status}: ${errText}`);
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`Model ${model} returned ${response.status}: ${errText.slice(0, 120)}... trying fallback`);
+        lastError = new Error(`Google API returned ${response.status}: ${errText}`);
+        continue; // Try next model in chain
+      }
+
+      const data = await response.json();
+      const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawJsonText) {
+        continue;
+      }
+
+      // Clean JSON text if wrapped in markdown
+      const cleanedJson = rawJsonText
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+
+      const parsed = JSON.parse(cleanedJson);
+      return ActionPlanSchema.parse(parsed);
+    } catch (err) {
+      lastError = err;
+      console.warn(`Attempt with ${model} failed, trying next candidate...`);
     }
-
-    const data = await response.json();
-    const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawJsonText) {
-      throw new Error('Empty response from Gemma/Gemini');
-    }
-
-    // Clean JSON text if wrapped in markdown
-    const cleanedJson = rawJsonText
-      .replace(/^```json\s*/i, '')
-      .replace(/^```\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim();
-
-    const parsed = JSON.parse(cleanedJson);
-    return ActionPlanSchema.parse(parsed);
-  } catch (err) {
-    console.error('Error generating action plan with Gemma:', err);
-    return generateFallbackPlan(documentText, documentName);
   }
+
+  console.error('All model candidates failed, using fallback plan:', lastError?.message);
+  return generateFallbackPlan(documentText, documentName);
 }
 
 /**
@@ -193,35 +210,47 @@ ${question}
 
 Provide a direct, helpful answer:`;
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
+  const candidateModels = Array.from(
+    new Set([
+      process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+    ])
+  );
+
+  for (const model of candidateModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 600,
           },
-        ],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 600,
-        },
-      }),
-    });
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Google API error: ${response.statusText}`);
+      if (!response.ok) {
+        continue;
+      }
+
+      const data = await response.json();
+      const answer = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (answer) return answer;
+    } catch (err) {
+      console.warn(`Chat attempt with ${model} failed, trying next candidate...`);
     }
-
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No answer available.';
-  } catch (err) {
-    console.error('Error answering question with Gemma:', err);
-    return 'Unable to contact Gemma AI at the moment. Please check your API key.';
   }
+
+  return 'Unable to contact Gemma AI at the moment. Please try again.';
 }
 
 /**
