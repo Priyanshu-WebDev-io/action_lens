@@ -88,7 +88,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
             <MessageSquare className="h-4 w-4 text-sky-600 shrink-0" />
             <span>Ask The Document</span>
           </h2>
-          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google Gemma 4</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google AI</p>
         </div>
 
         {messages.length > 1 && (
@@ -140,11 +140,10 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
 
             <div className="relative group max-w-[90%] sm:max-w-[85%]">
               <div
-                className={`rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs leading-relaxed ${
-                  m.role === 'user'
+                className={`rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs leading-relaxed ${m.role === 'user'
                     ? 'bg-sky-600 text-white shadow-sm whitespace-pre-wrap'
                     : 'bg-slate-50 border border-slate-200 text-slate-800'
-                }`}
+                  }`}
               >
                 <FormattedContent content={m.content} isUser={m.role === 'user'} />
               </div>
@@ -175,7 +174,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-600 flex items-center gap-2">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
-              <span>Gemma 4 is reasoning over document facts...</span>
+              <span>AI is reasoning over document facts...</span>
             </div>
           </div>
         )}

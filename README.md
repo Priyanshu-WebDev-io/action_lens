@@ -239,10 +239,13 @@ ActionLens is deliberately built to be lightweight, stateless, and privacy-respe
 3. **Configure environment variables:**
    Create a `.env.local` file in the root directory:
    ```env
-   # Google Gemini API key (for Gemma 4 inference)
+   # Google Gemini / Gemma API key
    GEMINI_API_KEY="your-gemini-api-key"
 
-   # Gemma 4 Primary Reasoning Model
+   # Primary Model (Default: gemini-3.8-flash for instant sub-2s responses)
+   PRIMARY_MODEL_NAME="gemini-3.8-flash"
+
+   # Failover & Track Qualification Model (Google Gemma 4 open-weights)
    GEMMA_MODEL_NAME="gemma-4-26b-a4b-it"
 
    # MinerU API Token (leave empty if using no-auth agent endpoint)

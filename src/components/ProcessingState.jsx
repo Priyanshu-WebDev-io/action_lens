@@ -5,7 +5,7 @@ export default function ProcessingState({ step = 2 }) {
   const steps = [
     { title: 'Document Ingestion', desc: 'Parsing PDF bytes and layout', icon: FileText },
     { title: 'MinerU Markdown Conversion', desc: 'Preserving structure, headers & tables', icon: Loader2 },
-    { title: 'Gemma 4 Reasoning Core', desc: 'Extracting actions, rules & dependencies', icon: Cpu },
+    { title: 'AI Reasoning Engine', desc: 'Extracting actions, rules & dependencies in real-time', icon: Cpu },
     { title: 'Zod Schema Validation', desc: 'Verifying structured data integrity', icon: ShieldCheck },
   ];
 
@@ -16,7 +16,7 @@ export default function ProcessingState({ step = 2 }) {
           <Cpu className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
         <h3 className="text-base sm:text-lg font-bold text-slate-900">Synthesizing Action Plan</h3>
-        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 px-2">Google Gemma 4 is parsing rules, prerequisites, and deadlines...</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 px-2">Analyzing rules, prerequisites, and deadlines in real-time...</p>
       </div>
 
       <div className="space-y-2.5 sm:space-y-3">

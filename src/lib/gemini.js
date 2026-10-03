@@ -272,14 +272,15 @@ ${documentText.slice(0, 15000)}
 
 Output pure JSON only, without any markdown backticks or commentary.`;
 
-  // Prioritize Google Gemma 4 as the primary reasoning model
+  // Primary engine: Gemini Flash for instant sub-2s responses, with Gemma 4 as failover
   const candidateModels = Array.from(
     new Set([
-      process.env.GEMMA_MODEL_NAME || 'gemma-4-26b-a4b-it',
-      'gemma-4-26b-a4b-it',
+      process.env.PRIMARY_MODEL_NAME || 'gemini-3.8-flash',
       'gemini-3.8-flash',
       'gemini-3.5-flash',
       'gemini-flash-latest',
+      process.env.GEMMA_MODEL_NAME || 'gemma-4-26b-a4b-it',
+      'gemma-4-26b-a4b-it',
     ])
   );
 
@@ -487,14 +488,15 @@ ${question}
 
 Provide an accurate, grounded, helpful answer:`;
 
-  // Prioritize Google Gemma 4 for grounded answers
+  // Primary engine: Gemini Flash for instant sub-2s responses, with Gemma 4 as failover
   const candidateModels = Array.from(
     new Set([
-      process.env.GEMMA_MODEL_NAME || 'gemma-4-26b-a4b-it',
-      'gemma-4-26b-a4b-it',
+      process.env.PRIMARY_MODEL_NAME || 'gemini-3.8-flash',
       'gemini-3.8-flash',
       'gemini-3.5-flash',
       'gemini-flash-latest',
+      process.env.GEMMA_MODEL_NAME || 'gemma-4-26b-a4b-it',
+      'gemma-4-26b-a4b-it',
     ])
   );
 
