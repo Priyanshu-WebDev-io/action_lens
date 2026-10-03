@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ActionItemSchema = z.object({
-  id: z.string().default(() => Math.random().toString(36).substring(2, 9)),
+  id: z.string().default(''),
   title: z.string(),
   description: z.string().optional().default(''),
   category: z.string().optional().default('General'),
@@ -11,7 +11,7 @@ export const ActionItemSchema = z.object({
 });
 
 export const DeadlineSchema = z.object({
-  id: z.string().default(() => Math.random().toString(36).substring(2, 9)),
+  id: z.string().default(''),
   title: z.string(),
   date: z.string(),
   time: z.string().optional().default(''),
@@ -21,7 +21,7 @@ export const DeadlineSchema = z.object({
 });
 
 export const RequirementSchema = z.object({
-  id: z.string().default(() => Math.random().toString(36).substring(2, 9)),
+  id: z.string().default(''),
   name: z.string(),
   format: z.string().optional().default(''),
   details: z.string().optional().default(''),
@@ -29,15 +29,15 @@ export const RequirementSchema = z.object({
 });
 
 export const DependencyStepSchema = z.object({
-  id: z.string().default(() => Math.random().toString(36).substring(2, 9)),
-  stepNumber: z.number(),
+  id: z.string().default(''),
+  stepNumber: z.number().default(1),
   title: z.string(),
   prerequisiteFor: z.string().optional().default(''),
   details: z.string().optional().default(''),
 });
 
 export const WarningSchema = z.object({
-  id: z.string().default(() => Math.random().toString(36).substring(2, 9)),
+  id: z.string().default(''),
   title: z.string(),
   consequence: z.string().optional().default(''),
   severity: z.enum(['critical', 'warning', 'info']).default('warning'),
