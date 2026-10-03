@@ -13,36 +13,16 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
   ]);
   const [input, setInput] = useState('');
   const [isAsking, setIsAsking] = useState(false);
-  const [askingElapsed, setAskingElapsed] = useState(0);
-  const [askingStage, setAskingStage] = useState(0);
   const [copiedIdx, setCopiedIdx] = useState(null);
-  const messagesEndRef = useRef(null);
-
-  // Live timer and stage progression for chat reasoning
-  useEffect(() => {
-    if (!isAsking) {
-      setAskingElapsed(0);
-      setAskingStage(0);
-      return;
-    }
-
-    const startTime = Date.now();
-    const timer = setInterval(() => {
-      setAskingElapsed(Date.now() - startTime);
-    }, 100);
-
-    const s1 = setTimeout(() => setAskingStage(1), 1200);
-    const s2 = setTimeout(() => setAskingStage(2), 2600);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(s1);
-      clearTimeout(s2);
-    };
-  }, [isAsking]);
+  const chatScrollRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({
+        top: chatScrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   };
 
   useEffect(() => {
@@ -151,7 +131,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
       )}
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-3 pr-1">
+      <div ref={chatScrollRef} className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-3 pr-1">
         {messages.map((m, idx) => (
           <div
             key={idx}
@@ -194,32 +174,15 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
 
         {isAsking && (
           <div className="flex items-start gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 border border-sky-200 shadow-xs animate-pulse">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 border border-sky-200">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="rounded-xl border border-sky-200 bg-sky-50/70 px-3.5 py-2.5 text-xs text-slate-700 shadow-xs space-y-1.5 max-w-[85%]">
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600 shrink-0" />
-                <span className="font-medium text-slate-800">
-                  {askingStage === 0
-                    ? 'Scanning document text & roadmap...'
-                    : askingStage === 1
-                    ? 'Cross-referencing rules & deadlines...'
-                    : 'Synthesizing verified grounded answer...'}
-                </span>
-                <span className="font-mono text-[10px] text-sky-700 bg-sky-100 px-1.5 py-0.5 rounded-full border border-sky-200 shrink-0">
-                  {(askingElapsed / 1000).toFixed(1)}s
-                </span>
-              </div>
-              <div className="flex items-center gap-1 pl-5">
-                <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-600 flex items-center gap-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600 shrink-0" />
+              <span>Finding answer in document...</span>
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Chat Input */}
