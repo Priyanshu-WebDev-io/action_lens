@@ -47,11 +47,159 @@ export async function parsePdfToMarkdown(buffer, filename = 'document.pdf') {
 }
 
 /**
- * Calls Google Gemma / Gemini API to extract the 6 structured ActionLens pillars.
+ * Normalizes and sanitizes raw model output to conform to ActionPlanSchema.
+ */
+function sanitizeActionPlan(raw, defaultTitle = 'Uploaded Notice') {
+  if (!raw || typeof raw !== 'object') {
+    throw new Error('Parsed plan is not an object');
+  }
+
+  const result = { ...raw };
+
+  result.documentTitle = result.documentTitle || defaultTitle;
+  result.documentType = result.documentType || 'Notice';
+  result.summary = result.summary || 'Summary generated from document.';
+  result.tags = Array.isArray(result.tags) ? result.tags : ['Notice', 'Action Plan'];
+
+  // Headings
+  if (!result.sectionHeadings || typeof result.sectionHeadings !== 'object' || Array.isArray(result.sectionHeadings)) {
+    result.sectionHeadings = {};
+  }
+
+  // Actions
+  if (Array.isArray(result.actions)) {
+    result.actions = result.actions.map((act, i) => ({
+      id: act.id || `act-${i + 1}`,
+      title: act.title || act.task || act.name || 'Action Item',
+      description: act.description || act.details || '',
+      category: act.category || act.assignee || 'General',
+      priority: ['high', 'medium', 'low'].includes(act.priority?.toLowerCase()) ? act.priority.toLowerCase() : 'medium',
+      isCompleted: Boolean(act.isCompleted),
+      estimatedTime: act.estimatedTime || act.time || undefined,
+    }));
+  } else {
+    result.actions = [];
+  }
+
+  // Deadlines
+  if (Array.isArray(result.deadlines)) {
+    result.deadlines = result.deadlines.map((dl, i) => ({
+      id: dl.id || `dl-${i + 1}`,
+      title: dl.title || dl.event || dl.name || dl.task || 'Important Deadline',
+      date: dl.date || dl.deadline || 'TBD',
+      time: dl.time || '',
+      isStrict: dl.isStrict !== undefined ? Boolean(dl.isStrict) : true,
+      notes: dl.notes || dl.details || '',
+      urgency: ['imminent', 'upcoming', 'standard'].includes(dl.urgency?.toLowerCase()) ? dl.urgency.toLowerCase() : 'upcoming',
+    }));
+  } else {
+    result.deadlines = [];
+  }
+
+  // Requirements
+  if (Array.isArray(result.requirements)) {
+    result.requirements = result.requirements.map((req, i) => {
+      if (typeof req === 'string') {
+        return {
+          id: `req-${i + 1}`,
+          name: req,
+          format: 'Standard',
+          details: '',
+          mandatory: true,
+        };
+      }
+      return {
+        id: req.id || `req-${i + 1}`,
+        name: req.name || req.title || req.item || 'Requirement',
+        format: req.format || 'Standard',
+        details: req.details || req.description || '',
+        mandatory: req.mandatory !== undefined ? Boolean(req.mandatory) : true,
+      };
+    });
+  } else {
+    result.requirements = [];
+  }
+
+  // Dependencies
+  if (Array.isArray(result.dependencies)) {
+    result.dependencies = result.dependencies.map((dep, i) => {
+      if (typeof dep === 'string') {
+        return {
+          id: `dep-${i + 1}`,
+          stepNumber: i + 1,
+          title: dep,
+          prerequisiteFor: '',
+          details: '',
+        };
+      }
+      return {
+        id: dep.id || `dep-${i + 1}`,
+        stepNumber: typeof dep.stepNumber === 'number' ? dep.stepNumber : i + 1,
+        title: dep.title || dep.step || dep.name || 'Sequential Step',
+        prerequisiteFor: dep.prerequisiteFor || '',
+        details: dep.details || dep.description || '',
+      };
+    });
+  } else {
+    result.dependencies = [];
+  }
+
+  // Warnings
+  if (Array.isArray(result.warnings)) {
+    result.warnings = result.warnings.map((warn, i) => {
+      if (typeof warn === 'string') {
+        return {
+          id: `warn-${i + 1}`,
+          title: warn,
+          consequence: '',
+          severity: 'warning',
+        };
+      }
+      return {
+        id: warn.id || `warn-${i + 1}`,
+        title: warn.title || warn.warning || warn.rule || 'Advisory',
+        consequence: warn.consequence || warn.penalty || warn.details || '',
+        severity: ['critical', 'warning', 'info'].includes(warn.severity?.toLowerCase()) ? warn.severity.toLowerCase() : 'warning',
+      };
+    });
+  } else {
+    result.warnings = [];
+  }
+
+  // Custom sections
+  if (Array.isArray(result.customSections)) {
+    result.customSections = result.customSections.map((cs, i) => ({
+      id: cs.id || `cs-${i + 1}`,
+      title: cs.title || `Section ${i + 1}`,
+      subtitle: cs.subtitle || '',
+      items: Array.isArray(cs.items)
+        ? cs.items.map((it, j) => ({
+            id: it.id || `it-${j + 1}`,
+            label: it.label || it.name || 'Item',
+            value: String(it.value || it.description || ''),
+            tag: it.tag || '',
+          }))
+        : [],
+    }));
+  } else {
+    result.customSections = [];
+  }
+
+  // Suggested questions
+  if (Array.isArray(result.suggestedQuestions)) {
+    result.suggestedQuestions = result.suggestedQuestions.filter((q) => typeof q === 'string' && q.trim().length > 0);
+  } else {
+    result.suggestedQuestions = [];
+  }
+
+  return result;
+}
+
+/**
+ * Calls Google Gemma 4 API (with fallback chain) to extract the structured ActionLens plan.
  */
 export async function generateActionPlanFromText(documentText, documentName = 'Uploaded Notice') {
   const apiKey = process.env.GEMINI_API_KEY;
-  const modelName = process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash';
 
   // If no API key is configured, check if this matches any sample or run heuristic extraction
   if (!apiKey) {
@@ -70,7 +218,7 @@ export async function generateActionPlanFromText(documentText, documentName = 'U
     return generateFallbackPlan(documentText, documentName);
   }
 
-  const systemInstruction = `You are ActionLens, a precise document-to-action reasoning engine powered by Google Gemma.
+  const systemInstruction = `You are ActionLens, a precise document-to-action reasoning engine powered by Google Gemma 4.
 Your job is NOT to produce generic summaries. You transform dense documents into a tailored, actionable roadmap.
 Crucially, you must customize the section headings and subtitles to fit the EXACT context of the document (e.g. for a holiday notice use "Schedule Adjustments" or "Observance Timeline"; for an exam notice use "Candidate Checklist" or "Examination Cutoffs").
 
@@ -110,7 +258,7 @@ Output ONLY a valid, clean JSON object matching this schema:
       "items": [{ "id": string, "label": string, "value": string, "tag": string }]
     }
   ],
-  "suggestedQuestions": [string] // 3 to 4 insightful, specific questions that ARE DIRECTLY AND ACCURATELY ANSWERED by the text of this document (e.g. key deadlines, mandatory steps, eligibility rules, penalties). CRITICAL: Every suggested question MUST be answerable from the document facts. Do NOT suggest questions whose answers are missing from the document.
+  "suggestedQuestions": [string] // 3 to 4 insightful, specific questions that ARE DIRECTLY AND ACCURATELY ANSWERED by the text of this document. Every question MUST be answerable from the text.
 }
 
 Note: If a section has no relevant data in the document (e.g. no deadlines, or no required physical documents), leave that array empty ([]). Never hallucinate or add filler content. Suggested questions must only ask about information actually present in the text.`;
@@ -124,9 +272,12 @@ ${documentText.slice(0, 15000)}
 
 Output pure JSON only, without any markdown backticks or commentary.`;
 
+  // Prioritize Google Gemma 4 as the primary reasoning model
   const candidateModels = Array.from(
     new Set([
-      process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash',
+      process.env.GEMMA_MODEL_NAME || 'gemma-4-26b-a4b-it',
+      'gemma-4-26b-a4b-it',
+      'gemini-3.8-flash',
       'gemini-3.5-flash',
       'gemini-flash-latest',
     ])
@@ -162,23 +313,38 @@ Output pure JSON only, without any markdown backticks or commentary.`;
       }
 
       const data = await response.json();
-      const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      // Gemma 4 returns thought reasoning tokens in parts with thought: true.
+      // Extract the actual response part (non-thought):
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const answerPart = parts.find((p) => !p.thought) || parts[parts.length - 1];
+      const rawJsonText = answerPart?.text;
       if (!rawJsonText) {
         continue;
       }
 
-      // Clean JSON text if wrapped in markdown
-      const cleanedJson = rawJsonText
-        .replace(/^```json\s*/i, '')
-        .replace(/^```\s*/i, '')
-        .replace(/\s*```$/i, '')
-        .trim();
+      // Clean JSON text if wrapped in markdown fences
+      let cleanedJson = rawJsonText.trim();
+      const fenceMatch = cleanedJson.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+      if (fenceMatch) {
+        cleanedJson = fenceMatch[1].trim();
+      } else {
+        const objectMatch = cleanedJson.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+        if (objectMatch) {
+          cleanedJson = objectMatch[0].trim();
+        }
+      }
 
       const parsed = JSON.parse(cleanedJson);
-      return ActionPlanSchema.parse(parsed);
+      // If model wrapped in an array, unwrap the first element
+      const planObject = Array.isArray(parsed) ? parsed[0] : parsed;
+      const sanitized = sanitizeActionPlan(planObject, documentName);
+      const validated = ActionPlanSchema.parse(sanitized);
+
+      console.log(`[ActionLens] Successfully generated action plan using primary model ${model} (${data.modelVersion || model})`);
+      return validated;
     } catch (err) {
       lastError = err;
-      console.warn(`Attempt with ${model} failed, trying next candidate...`);
+      console.warn(`Attempt with ${model} failed (${err.message}), trying next candidate...`);
     }
   }
 
@@ -321,9 +487,12 @@ ${question}
 
 Provide an accurate, grounded, helpful answer:`;
 
+  // Prioritize Google Gemma 4 for grounded answers
   const candidateModels = Array.from(
     new Set([
-      process.env.GEMMA_MODEL_NAME || 'gemini-3.8-flash',
+      process.env.GEMMA_MODEL_NAME || 'gemma-4-26b-a4b-it',
+      'gemma-4-26b-a4b-it',
+      'gemini-3.8-flash',
       'gemini-3.5-flash',
       'gemini-flash-latest',
     ])
@@ -356,8 +525,13 @@ Provide an accurate, grounded, helpful answer:`;
       }
 
       const data = await response.json();
-      const answer = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if (answer) return answer;
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const answerPart = parts.find((p) => !p.thought) || parts[parts.length - 1];
+      const answer = answerPart?.text?.trim();
+      if (answer) {
+        console.log(`[ActionLens] Copilot answered using primary model ${model} (${data.modelVersion || model})`);
+        return answer;
+      }
     } catch (err) {
       console.warn(`Chat attempt with ${model} failed: ${err.message}, trying next candidate...`);
     }

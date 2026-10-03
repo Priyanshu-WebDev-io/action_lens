@@ -242,6 +242,9 @@ ActionLens is deliberately built to be lightweight, stateless, and privacy-respe
    # Google Gemini API key (for Gemma 4 inference)
    GEMINI_API_KEY="your-gemini-api-key"
 
+   # Gemma 4 Primary Reasoning Model
+   GEMMA_MODEL_NAME="gemma-4-26b-a4b-it"
+
    # MinerU API Token (leave empty if using no-auth agent endpoint)
    MINERU_API_TOKEN=""
    ```

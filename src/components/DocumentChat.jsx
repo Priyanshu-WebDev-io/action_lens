@@ -88,7 +88,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
             <MessageSquare className="h-4 w-4 text-sky-600 shrink-0" />
             <span>Ask The Document</span>
           </h2>
-          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google Gemma</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Instant grounded answers verified by Google Gemma 4</p>
         </div>
 
         {messages.length > 1 && (
@@ -175,7 +175,7 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-600 flex items-center gap-2">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
-              <span>Gemma is reasoning over document facts...</span>
+              <span>Gemma 4 is reasoning over document facts...</span>
             </div>
           </div>
         )}
