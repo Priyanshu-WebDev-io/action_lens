@@ -213,39 +213,51 @@ export default function DocumentChat({ documentText, plan, suggestedQuestions = 
   );
 }
 
+function autoFixMarkdown(text) {
+  if (!text) return '';
+  let str = text;
+
+  // Auto-close uncompleted bold tags (**... without closing **)
+  const boldMatches = str.match(/\*\*/g);
+  if (boldMatches && boldMatches.length % 2 !== 0) {
+    str += '**';
+  }
+
+  // Auto-close uncompleted inline code tags (`... without closing `)
+  const codeMatches = str.match(/`/g);
+  if (codeMatches && codeMatches.length % 2 !== 0) {
+    str += '`';
+  }
+
+  return str;
+}
+
 function renderInline(text) {
   if (!text) return '';
+  const fixedText = autoFixMarkdown(text);
   const parts = [];
-  let remaining = text;
+  let remaining = fixedText;
   let key = 0;
 
   while (remaining.length > 0) {
     const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
     const codeMatch = remaining.match(/`(.+?)`/);
+    const linkMatch = remaining.match(/\[(.+?)\]\((.+?)\)/);
 
-    let firstMatch = null;
-    let matchType = null;
+    const candidates = [
+      { match: boldMatch, type: 'bold' },
+      { match: codeMatch, type: 'code' },
+      { match: linkMatch, type: 'link' },
+    ].filter((c) => c.match !== null);
 
-    if (boldMatch && codeMatch) {
-      if (boldMatch.index < codeMatch.index) {
-        firstMatch = boldMatch;
-        matchType = 'bold';
-      } else {
-        firstMatch = codeMatch;
-        matchType = 'code';
-      }
-    } else if (boldMatch) {
-      firstMatch = boldMatch;
-      matchType = 'bold';
-    } else if (codeMatch) {
-      firstMatch = codeMatch;
-      matchType = 'code';
-    }
-
-    if (!firstMatch) {
+    if (candidates.length === 0) {
       parts.push(remaining);
       break;
     }
+
+    candidates.sort((a, b) => a.match.index - b.match.index);
+    const firstMatch = candidates[0].match;
+    const matchType = candidates[0].type;
 
     if (firstMatch.index > 0) {
       parts.push(remaining.substring(0, firstMatch.index));
@@ -265,6 +277,18 @@ function renderInline(text) {
         >
           {firstMatch[1]}
         </code>
+      );
+    } else if (matchType === 'link') {
+      parts.push(
+        <a
+          key={key++}
+          href={firstMatch[2]}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sky-600 hover:text-sky-800 underline font-medium"
+        >
+          {firstMatch[1]}
+        </a>
       );
     }
 
@@ -288,6 +312,34 @@ function FormattedContent({ content, isUser }) {
           return <div key={lineIdx} className="h-1" />;
         }
 
+        // Markdown Headers: ###, ##, #
+        if (trimmed.startsWith('### ')) {
+          return (
+            <h4 key={lineIdx} className="font-bold text-slate-900 text-xs mt-2 mb-0.5">
+              {renderInline(trimmed.replace(/^###\s*/, ''))}
+            </h4>
+          );
+        }
+        if (trimmed.startsWith('## ') || trimmed.startsWith('# ')) {
+          return (
+            <h3 key={lineIdx} className="font-bold text-slate-900 text-xs sm:text-sm mt-2.5 mb-1">
+              {renderInline(trimmed.replace(/^#{1,2}\s*/, ''))}
+            </h3>
+          );
+        }
+
+        // Numbered list: 1. Item
+        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+        if (numMatch) {
+          return (
+            <div key={lineIdx} className="flex items-start gap-1.5 ml-1">
+              <span className="text-sky-600 font-semibold shrink-0">{numMatch[1]}.</span>
+              <div className="flex-1">{renderInline(numMatch[2])}</div>
+            </div>
+          );
+        }
+
+        // Bullet lists
         if (
           trimmed.startsWith('• ') ||
           trimmed.startsWith('- ') ||
@@ -302,6 +354,7 @@ function FormattedContent({ content, isUser }) {
           );
         }
 
+        // Blockquotes
         if (trimmed.startsWith('> ')) {
           const quoteText = trimmed.slice(2);
           return (

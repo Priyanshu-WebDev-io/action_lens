@@ -515,7 +515,7 @@ Provide an accurate, grounded, helpful answer:`;
           ],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 800,
+            maxOutputTokens: 3000,
           },
         }),
       });
