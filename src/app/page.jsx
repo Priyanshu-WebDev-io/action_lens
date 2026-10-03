@@ -13,26 +13,30 @@ import WarningsView from '@/components/WarningsView';
 import CustomSectionsView from '@/components/CustomSectionsView';
 import DocumentChat from '@/components/DocumentChat';
 
+import { SAMPLE_DOCUMENTS } from '@/lib/sampleData';
+
 export default function Home() {
   const [plan, setPlan] = useState(null);
   const [rawText, setRawText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
+  const [processingDocName, setProcessingDocName] = useState('Uploaded Notice');
   const [errorMessage, setErrorMessage] = useState('');
 
   // Handle PDF file upload
   const handleProcessFile = async (file) => {
     setIsLoading(true);
     setErrorMessage('');
-    setProcessingStep(1);
+    setProcessingDocName(file.name || 'Uploaded PDF Notice');
+    setProcessingStep(0);
+
+    const timer1 = setTimeout(() => setProcessingStep(1), 600);
+    const timer2 = setTimeout(() => setProcessingStep(2), 1500);
+    const timer3 = setTimeout(() => setProcessingStep(3), 3400);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
-
-      // Smooth step updates for polished UX
-      const timer1 = setTimeout(() => setProcessingStep(2), 700);
-      const timer2 = setTimeout(() => setProcessingStep(3), 1600);
 
       const res = await fetch('/api/process', {
         method: 'POST',
@@ -41,6 +45,7 @@ export default function Home() {
 
       clearTimeout(timer1);
       clearTimeout(timer2);
+      clearTimeout(timer3);
 
       const data = await res.json();
       if (!data.success) {
@@ -53,6 +58,9 @@ export default function Home() {
       console.error(err);
       setErrorMessage(err.message || 'Error communicating with document engine.');
     } finally {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
       setIsLoading(false);
     }
   };
@@ -61,18 +69,21 @@ export default function Home() {
   const handleProcessText = async (text) => {
     setIsLoading(true);
     setErrorMessage('');
-    setProcessingStep(2);
+    setProcessingDocName('Pasted Circular Notice');
+    setProcessingStep(1);
+
+    const timer1 = setTimeout(() => setProcessingStep(2), 800);
+    const timer2 = setTimeout(() => setProcessingStep(3), 2200);
 
     try {
-      const timer = setTimeout(() => setProcessingStep(3), 1000);
-
       const res = await fetch('/api/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
 
-      clearTimeout(timer);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
 
       const data = await res.json();
       if (!data.success) {
@@ -85,6 +96,8 @@ export default function Home() {
       console.error(err);
       setErrorMessage(err.message || 'Error processing document text.');
     } finally {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       setIsLoading(false);
     }
   };
@@ -93,12 +106,15 @@ export default function Home() {
   const handleSelectDemo = async (demoId) => {
     setIsLoading(true);
     setErrorMessage('');
-    setProcessingStep(1);
+    const sample = SAMPLE_DOCUMENTS.find((d) => d.id === demoId);
+    setProcessingDocName(sample ? sample.name : 'Sample Notice');
+    setProcessingStep(0);
+
+    const timer1 = setTimeout(() => setProcessingStep(1), 350);
+    const timer2 = setTimeout(() => setProcessingStep(2), 800);
+    const timer3 = setTimeout(() => setProcessingStep(3), 1400);
 
     try {
-      const timer1 = setTimeout(() => setProcessingStep(2), 400);
-      const timer2 = setTimeout(() => setProcessingStep(3), 900);
-
       const res = await fetch('/api/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -107,6 +123,7 @@ export default function Home() {
 
       clearTimeout(timer1);
       clearTimeout(timer2);
+      clearTimeout(timer3);
 
       const data = await res.json();
       if (!data.success) {
@@ -119,6 +136,9 @@ export default function Home() {
       console.error(err);
       setErrorMessage(err.message || 'Failed to load sample circular.');
     } finally {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
       setIsLoading(false);
     }
   };
@@ -163,8 +183,8 @@ export default function Home() {
         )}
 
         {isLoading ? (
-          <div className="py-10 sm:py-16">
-            <ProcessingState step={processingStep} />
+          <div className="py-8 sm:py-14">
+            <ProcessingState step={processingStep} documentName={processingDocName} />
           </div>
         ) : !plan ? (
           <div className="py-4 sm:py-12">
